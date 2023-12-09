@@ -1,32 +1,65 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MusicStoreApi.Entities;
+using MusicStoreApi.Models;
+using MusicStoreApi.Services;
 
 namespace MusicStoreApi.Controllers
 {
     [Route("api/artist")]
     public class ArtistController : ControllerBase
     {
-        private readonly ArtistDbContext dbContext;
+        
+        private readonly IArtistService artistService;
 
-        public ArtistController(ArtistDbContext dbContext)
+        public ArtistController(IArtistService artistService)
         {
-            this.dbContext = dbContext;
+            this.artistService = artistService;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Artist>> GetAll(int id)
+        [HttpPost]
+        public ActionResult CreateArtist([FromBody]CreateArtistDto createdArtistDto)
         {
-            var artists = dbContext.Artists.ToList();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(artists);
+            int id = artistService.Create(createdArtistDto);
+
+            return Created($"/api/artist/{id}", null);
+        }
+
+        [HttpDelete("{id}")]
+        public ActionResult DeleteArtist([FromRoute]int id) 
+        {
+            bool isDeleted = artistService.Delete(id);
+
+            if (isDeleted) return NoContent();
+
+            return NotFound();
+        }
+
+
+        [HttpGet]
+        public ActionResult<IEnumerable<ArtistDto>> GetAll()
+        {
+            var artistsDtos = artistService.GetAll();
+
+            return Ok(artistsDtos);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Artist> Get([FromRoute] int id)
+        public ActionResult<ArtistDto> Get([FromRoute] int id)
         {
-            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
+            var artistDto = artistService.GetById(id);
 
-            return Ok(artist);
+            if (artistDto == null) return NotFound();
+
+            return Ok(artistDto);
         }
 
     }

@@ -2,6 +2,8 @@
 
 using MusicStoreApi;
 using MusicStoreApi.Entities;
+using MusicStoreApi.Services;
+using System.Reflection;
 
 public class Program
     {
@@ -14,6 +16,8 @@ public class Program
             builder.Services.AddControllers();
             builder.Services.AddDbContext<ArtistDbContext>();
             builder.Services.AddScoped<ArtistSeeder>();
+            builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+            builder.Services.AddScoped<IArtistService, ArtistService>();
 
             var app = builder.Build();
 

@@ -17,7 +17,11 @@ namespace MusicStoreApi.Entities
             modelBuilder.Entity<Artist>()
                 .Property(a => a.Name)
                 .IsRequired()
-                .HasMaxLength(20);
+                .HasMaxLength(25);
+            modelBuilder.Entity<Artist>()
+                .Property(a => a.Description)
+                .IsRequired()
+                .HasMaxLength(50);
 
             modelBuilder.Entity<Album>()
                 .Property(a => a.Title)
