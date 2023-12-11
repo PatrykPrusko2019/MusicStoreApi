@@ -1,8 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace MusicStoreApi.Models
 {
-    public class CreateArtistDto
+    public class UpdateArtistDto
     {
         [Required]
         [MaxLength(25)]

@@ -6,6 +6,7 @@ namespace MusicStoreApi.Services
     {
         int Create(CreateArtistDto createdArtistDto);
         bool Delete(int id);
+        bool Update(int id, UpdateArtistDto updatedArtistDto);
         IEnumerable<ArtistDto> GetAll();
         ArtistDto GetById(int id);
     }

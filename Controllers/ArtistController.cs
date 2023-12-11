@@ -12,7 +12,7 @@ namespace MusicStoreApi.Controllers
     [Route("api/artist")]
     public class ArtistController : ControllerBase
     {
-        
+
         private readonly IArtistService artistService;
 
         public ArtistController(IArtistService artistService)
@@ -21,7 +21,7 @@ namespace MusicStoreApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateArtist([FromBody]CreateArtistDto createdArtistDto)
+        public ActionResult CreateArtist([FromBody] CreateArtistDto createdArtistDto)
         {
             if (!ModelState.IsValid)
             {
@@ -34,13 +34,23 @@ namespace MusicStoreApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteArtist([FromRoute]int id) 
+        public ActionResult DeleteArtist([FromRoute] int id)
         {
             bool isDeleted = artistService.Delete(id);
 
-            if (isDeleted) return NoContent();
+            if (isDeleted) return Ok();
 
             return NotFound();
+        }
+
+        [HttpPut("{id}")]
+        public ActionResult Update([FromRoute]int id, [FromBody]UpdateArtistDto updateArtistDto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+
+            bool isUpdated = artistService.Update(id, updateArtistDto);
+            if (isUpdated is false) return NotFound();
+            return Ok();
         }
 
 

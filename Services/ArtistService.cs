@@ -88,6 +88,24 @@ namespace MusicStoreApi.Services
             return artistDto;
         }
 
+        public bool Update(int id, UpdateArtistDto updatedArtistDto)
+        {
+            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
+            if (artist is null) { return  false; }
 
+            artist.Address = dbContext.Addresses.FirstOrDefault(a => a.Id == id);
+
+            artist.Name = updatedArtistDto.Name;
+            artist.Description = updatedArtistDto.Description;
+            artist.KindOfMusic = updatedArtistDto.KindOfMusic;
+            artist.ContactEmail = updatedArtistDto.ContactEmail;
+            artist.ContactNumber = updatedArtistDto.ContactNumber;
+            artist.Address.Country = updatedArtistDto.Country;
+            artist.Address.City = updatedArtistDto.City;
+
+            dbContext.SaveChanges();
+
+            return true;
+        }
     }
 }
