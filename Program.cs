@@ -2,7 +2,9 @@
 
 using MusicStoreApi;
 using MusicStoreApi.Entities;
+using MusicStoreApi.Middleware;
 using MusicStoreApi.Services;
+using NLog.Web;
 using System.Reflection;
 
 public class Program
@@ -11,6 +13,10 @@ public class Program
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            // NLog: Setup Nlog for Dependency injection
+            builder.Logging.ClearProviders();
+            builder.Host.UseNLog();
+
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -18,6 +24,8 @@ public class Program
             builder.Services.AddScoped<ArtistSeeder>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddScoped<IArtistService, ArtistService>();
+            builder.Services.AddScoped<ErrorHandlingMiddleware>();
+            builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
 
@@ -26,10 +34,17 @@ public class Program
             var seeder = scope.ServiceProvider.GetRequiredService<ArtistSeeder>();
             seeder.Seed();
 
+            app.UseMiddleware<ErrorHandlingMiddleware>();
+
             app.UseHttpsRedirection();
 
-            app.UseAuthorization();
+            app.UseSwagger();
+        app.UseSwaggerUI(c =>
+        {
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "MusicStore API");
+        });        
 
+            app.UseAuthorization();
 
             app.MapControllers();
 

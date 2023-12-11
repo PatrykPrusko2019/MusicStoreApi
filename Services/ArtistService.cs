@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MusicStoreApi.Entities;
+using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
 
 namespace MusicStoreApi.Services
@@ -9,11 +10,13 @@ namespace MusicStoreApi.Services
     {
         private readonly ArtistDbContext dbContext;
         private readonly IMapper mapper;
+        private readonly ILogger<ArtistService> logger;
 
-        public ArtistService(ArtistDbContext artistDbContext, IMapper mapper)
+        public ArtistService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger)
         {
-            this.dbContext = artistDbContext;
+            this.dbContext = dbContext;
             this.mapper = mapper;
+            this.logger = logger;
         }
 
         public int Create(CreateArtistDto createdArtistDto)
@@ -25,16 +28,17 @@ namespace MusicStoreApi.Services
             return createdArtist.Id;
         }
 
-        public bool Delete(int id)
+        public void Delete(int id)
         {
+            logger.LogError($"Artist with id: {id} DELETE action invoked");
+
             var deleteArtist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
 
-            if (deleteArtist is null) return false;
+            if (deleteArtist is null) throw new NotFoundException("Artist not found");
 
             dbContext.Artists.Remove(deleteArtist);
             dbContext.SaveChanges();
 
-            return true;
         }
 
         public IEnumerable<ArtistDto> GetAll()
@@ -70,7 +74,7 @@ namespace MusicStoreApi.Services
 
             if (artist is null)
             {
-                return null;
+                throw new NotFoundException("Artist not found");
             }
 
             if (artist.Albums is not null)
@@ -88,10 +92,14 @@ namespace MusicStoreApi.Services
             return artistDto;
         }
 
-        public bool Update(int id, UpdateArtistDto updatedArtistDto)
+        public void Update(int id, UpdateArtistDto updatedArtistDto)
         {
             var artist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
-            if (artist is null) { return  false; }
+            
+            if (artist is null) 
+            {
+                throw new NotFoundException("Artist not found");
+            }
 
             artist.Address = dbContext.Addresses.FirstOrDefault(a => a.Id == id);
 
@@ -104,8 +112,6 @@ namespace MusicStoreApi.Services
             artist.Address.City = updatedArtistDto.City;
 
             dbContext.SaveChanges();
-
-            return true;
         }
     }
 }

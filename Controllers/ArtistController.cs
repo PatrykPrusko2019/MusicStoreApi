@@ -10,6 +10,7 @@ using MusicStoreApi.Services;
 namespace MusicStoreApi.Controllers
 {
     [Route("api/artist")]
+    [ApiController]
     public class ArtistController : ControllerBase
     {
 
@@ -23,11 +24,6 @@ namespace MusicStoreApi.Controllers
         [HttpPost]
         public ActionResult CreateArtist([FromBody] CreateArtistDto createdArtistDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             int id = artistService.Create(createdArtistDto);
 
             return Created($"/api/artist/{id}", null);
@@ -36,20 +32,16 @@ namespace MusicStoreApi.Controllers
         [HttpDelete("{id}")]
         public ActionResult DeleteArtist([FromRoute] int id)
         {
-            bool isDeleted = artistService.Delete(id);
+            artistService.Delete(id);
 
-            if (isDeleted) return Ok();
-
-            return NotFound();
+            return Ok();
         }
 
         [HttpPut("{id}")]
         public ActionResult Update([FromRoute]int id, [FromBody]UpdateArtistDto updateArtistDto)
         {
-            if (!ModelState.IsValid) return BadRequest(ModelState);
+            artistService.Update(id, updateArtistDto);
 
-            bool isUpdated = artistService.Update(id, updateArtistDto);
-            if (isUpdated is false) return NotFound();
             return Ok();
         }
 
@@ -66,8 +58,6 @@ namespace MusicStoreApi.Controllers
         public ActionResult<ArtistDto> Get([FromRoute] int id)
         {
             var artistDto = artistService.GetById(id);
-
-            if (artistDto == null) return NotFound();
 
             return Ok(artistDto);
         }
