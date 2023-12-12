@@ -56,6 +56,7 @@ namespace MusicStoreApi.Controllers
 
         [HttpGet("{id}")]
         public ActionResult<ArtistDto> Get([FromRoute] int id)
+        
         {
             var artistDto = artistService.GetById(id);
 
