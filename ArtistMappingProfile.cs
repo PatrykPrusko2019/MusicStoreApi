@@ -13,12 +13,14 @@ namespace MusicStoreApi
                 .ForMember(m => m.Country, c => c.MapFrom(a => a.Address.Country));
 
             CreateMap<Album, AlbumDto>();
-
+            
             CreateMap<Song, SongDto>();
 
             CreateMap<CreateArtistDto, Artist>()
                 .ForMember(a => a.Address, c => c.MapFrom(dto =>
                 new Address() { Country = dto.Country, City = dto.City }));
+
+            CreateMap<CreateAlbumDto, Album>();
 
         }
     }

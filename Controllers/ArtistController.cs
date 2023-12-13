@@ -22,7 +22,7 @@ namespace MusicStoreApi.Controllers
         }
 
         [HttpPost]
-        public ActionResult CreateArtist([FromBody] CreateArtistDto createdArtistDto)
+        public ActionResult Create([FromBody] CreateArtistDto createdArtistDto)
         {
             int id = artistService.Create(createdArtistDto);
 
@@ -30,7 +30,7 @@ namespace MusicStoreApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult DeleteArtist([FromRoute] int id)
+        public ActionResult Delete([FromRoute] int id)
         {
             artistService.Delete(id);
 

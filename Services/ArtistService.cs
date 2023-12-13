@@ -30,8 +30,6 @@ namespace MusicStoreApi.Services
 
         public void Delete(int id)
         {
-            logger.LogError($"Artist with id: {id} DELETE action invoked");
-
             var deleteArtist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
 
             if (deleteArtist is null) throw new NotFoundException("Artist not found");
@@ -41,7 +39,7 @@ namespace MusicStoreApi.Services
 
         }
 
-        public IEnumerable<ArtistDto> GetAll()
+        public List<ArtistDto> GetAll()
         {
             var artists = dbContext.Artists
                 .Include(a => a.Address)

@@ -24,6 +24,7 @@ public class Program
             builder.Services.AddScoped<ArtistSeeder>();
             builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
             builder.Services.AddScoped<IArtistService, ArtistService>();
+            builder.Services.AddScoped<IAlbumService, AlbumService>();
             builder.Services.AddScoped<ErrorHandlingMiddleware>();
             builder.Services.AddScoped<RequestTimeMiddleware>();
             builder.Services.AddSwaggerGen();

@@ -11,8 +11,8 @@ using MusicStoreApi.Entities;
 namespace MusicStoreApi.Migrations
 {
     [DbContext(typeof(ArtistDbContext))]
-    [Migration("20231208221445__Init")]
-    partial class _Init
+    [Migration("20231212165448_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,15 +97,17 @@ namespace MusicStoreApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("KindOfMusic")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Id");
 
