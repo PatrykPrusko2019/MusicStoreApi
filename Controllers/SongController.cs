@@ -39,6 +39,8 @@ namespace MusicStoreApi.Controllers
 
             return Ok($"/api/artist/{artistId}/album/{albumId}/song/{songId}");
         }
+
+        [HttpGet]
         public ActionResult<List<SongDto>> GetAll([FromRoute]int artistId, [FromRoute]int albumId)
         {
             var songs = songService.GetAll(artistId, albumId);
