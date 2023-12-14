@@ -29,11 +29,11 @@ namespace MusicStoreApi.Controllers
         {
             albumService.Update(artistId, albumId, updateAlbumDto);
 
-            return Ok();
+            return Ok($"/api/artist/{artistId}/album/{albumId}");
         }
 
         [HttpDelete("{albumId}")]
-        public ActionResult Delete(int artistId, [FromRoute] int albumId) 
+        public ActionResult Delete([FromRoute]int artistId, [FromRoute] int albumId) 
         {
             albumService.Delete(artistId, albumId);
 
@@ -49,7 +49,7 @@ namespace MusicStoreApi.Controllers
         }
 
         [HttpGet("{albumId}")]
-        public ActionResult GetById(int artistId, [FromRoute]int albumId)
+        public ActionResult GetById([FromRoute] int artistId, [FromRoute]int albumId)
         {
             var album  = albumService.GetById(artistId ,albumId);
 

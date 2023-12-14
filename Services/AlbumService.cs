@@ -31,7 +31,7 @@ namespace MusicStoreApi.Services
             albumEntity.ArtistId = artistId;
             dbContext.Albums.Add(albumEntity);
             dbContext.SaveChanges();
-            logger.LogInformation($"Created new album: {albumEntity.Title} , api/{artistId}/album/{albumEntity.Id}");
+            logger.LogInformation($"Created new album: {albumEntity.Title} , api/artist/{artistId}/album/{albumEntity.Id}");
 
             return albumEntity.Id;
         }
@@ -50,7 +50,7 @@ namespace MusicStoreApi.Services
             album.Price = updateAlbumDto.Price;
 
             dbContext.SaveChanges();
-            logger.LogInformation($"Updated album: {album.Title} , api/{artistId}/album/{album.Id}");
+            logger.LogInformation($"Updated album: {album.Title} , api/artist/{artistId}/album/{album.Id}");
         }
 
         public void Delete(int artistId, int albumId)
@@ -65,7 +65,7 @@ namespace MusicStoreApi.Services
             dbContext.Albums.Remove(album);
 
             dbContext.SaveChanges();
-            logger.LogInformation($"Delete album: {title} , api/{artistId}/album/{albumId}");
+            logger.LogInformation($"Delete album: {title} , api/artist/{artistId}/album/{albumId}");
         }
 
         public List<AlbumDto> GetAll(int artistId)
@@ -77,7 +77,7 @@ namespace MusicStoreApi.Services
                 .Include(s => s.Songs)
                 .Where(a => a.ArtistId == artistId).ToList();
 
-            if (albums == null || albums.Count == 0) throw new NotFoundException("Album not found");
+            if (albums is null || albums.Count == 0) throw new NotFoundException("Album not found");
 
             var albumsDtos = mapper.Map<List<AlbumDto>>(albums);
 

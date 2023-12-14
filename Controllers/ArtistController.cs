@@ -34,7 +34,7 @@ namespace MusicStoreApi.Controllers
         {
             artistService.Delete(id);
 
-            return Ok();
+            return Ok($"/api/artist/{id}");
         }
 
         [HttpPut("{id}")]
@@ -42,7 +42,7 @@ namespace MusicStoreApi.Controllers
         {
             artistService.Update(id, updateArtistDto);
 
-            return Ok();
+            return Ok($"/api/artist/{id}");
         }
 
 

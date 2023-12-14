@@ -24,6 +24,7 @@ namespace MusicStoreApi.Services
             var createdArtist = mapper.Map<Artist>(createdArtistDto);
             dbContext.Artists.Add(createdArtist);
             dbContext.SaveChanges();
+            logger.LogInformation($"Created new artist: {createdArtist.Name} , api/artist/{createdArtist.Id}");
 
             return createdArtist.Id;
         }
@@ -33,9 +34,11 @@ namespace MusicStoreApi.Services
             var deleteArtist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
 
             if (deleteArtist is null) throw new NotFoundException("Artist not found");
+            string name = deleteArtist.Name;
 
             dbContext.Artists.Remove(deleteArtist);
             dbContext.SaveChanges();
+            logger.LogInformation($"Deleted artist: {name} , api/artist/{id}");
 
         }
 
@@ -110,6 +113,7 @@ namespace MusicStoreApi.Services
             artist.Address.City = updatedArtistDto.City;
 
             dbContext.SaveChanges();
+            logger.LogInformation($"Updated artist: {artist.Name} , api/artist/{artist.Id}");
         }
     }
 }

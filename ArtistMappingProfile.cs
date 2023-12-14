@@ -22,6 +22,8 @@ namespace MusicStoreApi
 
             CreateMap<CreateAlbumDto, Album>();
 
+            CreateMap<CreateSongDto, Song>();
+
         }
     }
 }

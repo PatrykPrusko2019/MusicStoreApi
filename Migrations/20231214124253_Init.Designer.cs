@@ -11,7 +11,7 @@ using MusicStoreApi.Entities;
 namespace MusicStoreApi.Migrations
 {
     [DbContext(typeof(ArtistDbContext))]
-    [Migration("20231212165448_Init")]
+    [Migration("20231214124253_Init")]
     partial class Init
     {
         /// <inheritdoc />
