@@ -31,9 +31,8 @@ namespace MusicStoreApi.Services
 
         public void Delete(int id)
         {
-            var deleteArtist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
+            var deleteArtist = GetArtistById(id);
 
-            if (deleteArtist is null) throw new NotFoundException("Artist not found");
             string name = deleteArtist.Name;
 
             dbContext.Artists.Remove(deleteArtist);
@@ -68,15 +67,7 @@ namespace MusicStoreApi.Services
 
         public ArtistDto GetById(int id)
         {
-            var artist = dbContext.Artists
-                .Include(a => a.Address)
-                .Include(a => a.Albums)
-                .FirstOrDefault(a => a.Id == id);
-
-            if (artist is null)
-            {
-                throw new NotFoundException("Artist not found");
-            }
+            var artist = GetArtistById(id);
 
             if (artist.Albums is not null)
             {
@@ -95,12 +86,7 @@ namespace MusicStoreApi.Services
 
         public void Update(int id, UpdateArtistDto updatedArtistDto)
         {
-            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == id);
-            
-            if (artist is null) 
-            {
-                throw new NotFoundException("Artist not found");
-            }
+            var artist = GetArtistById(id);
 
             artist.Address = dbContext.Addresses.FirstOrDefault(a => a.Id == id);
 
@@ -114,6 +100,16 @@ namespace MusicStoreApi.Services
 
             dbContext.SaveChanges();
             logger.LogInformation($"Updated artist: {artist.Name} , api/artist/{artist.Id}");
+        }
+
+        private Artist GetArtistById(int artistId)
+        {
+            Artist artist = dbContext.Artists
+                .Include(a => a.Address)
+                .Include(a => a.Albums)
+                .FirstOrDefault(a => a.Id == artistId);
+            if (artist is null) throw new NotFoundException("Artist not found");
+            return artist;
         }
     }
 }

@@ -23,10 +23,7 @@ namespace MusicStoreApi.Services
 
         public int Create(int artistId, int albumId, CreateSongDto createSongDto)
         {
-            var album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            if (album == null) { throw new NotFoundException("Artist, Album not found"); }
+            var album = GetAlbumById(artistId, albumId, 2);
 
             var songEntity = mapper.Map<Song>(createSongDto);
             songEntity.AlbumId = album.Id;
@@ -40,10 +37,7 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, int songId, UpdateSongDto createSongDto)
         {
-            var album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId&& a.Id == albumId);
-            if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
+            var album = GetAlbumById(artistId, albumId, 1);
 
             var song = album.Songs.FirstOrDefault(s => s.Id == songId);
             if (song is null) throw new NotFoundException("Song not found");
@@ -56,10 +50,7 @@ namespace MusicStoreApi.Services
 
         public void Delete(int artistId, int albumId, int songId)
         {
-            var album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
+            var album = GetAlbumById(artistId, albumId, 1);
 
             var deleteSong = album.Songs.FirstOrDefault(s => s.Id == songId);
             if (deleteSong is null) throw new NotFoundException("Song not found");
@@ -70,14 +61,9 @@ namespace MusicStoreApi.Services
             logger.LogInformation($"Removed song: {name} , api/artist/{artistId}/album/{albumId}/song/{songId}");
         }
 
-
-
         public List<SongDto> GetAll(int artistId, int albumId) 
         {
-            var album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album not found");
+            var album = GetAlbumById(artistId, albumId, 1);
 
             var songsDtos = mapper.Map<List<SongDto>>(album.Songs);
             return songsDtos;
@@ -85,10 +71,7 @@ namespace MusicStoreApi.Services
 
         public SongDto GetById(int artistId, int albumId, int songId)
         {
-            var album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
+            var album = GetAlbumById(artistId, albumId, 1);
 
             var song = album.Songs.FirstOrDefault(s => s.Id == songId);
             if (song is null) throw new NotFoundException("Song not found");
@@ -97,6 +80,27 @@ namespace MusicStoreApi.Services
             return songDto;
         }
 
+        private Album GetAlbumById(int artistId, int albumId, int selectedOption)
+        {
+            Album album = null;
+            switch (selectedOption)
+            {
+                case 1:
+                    album = artistDbContext.Albums
+                .Include(s => s.Songs)
+                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+                    if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
+                    break;
+
+                case 2:
+                    album = artistDbContext.Albums
+                .Include(s => s.Songs)
+                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+                    if (album == null) { throw new NotFoundException("Artist, Album not found"); }
+                    break;
+            }
+            return album;
+        }
 
     }
 }

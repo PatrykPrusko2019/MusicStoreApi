@@ -23,8 +23,7 @@ namespace MusicStoreApi.Services
        
         public int Create(int artistId, CreateAlbumDto createAlbumDto)
         {
-            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId);
-            if (artist == null) throw new NotFoundException("Artist not found");
+            GetArtistById(artistId);
 
             var albumEntity = mapper.Map<Album>(createAlbumDto);
 
@@ -38,11 +37,7 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, UpdateAlbumDto updateAlbumDto)
         {
-            var album = dbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-
-            if (album is null) throw new NotFoundException("Artist and Album not found");
+            var album = GetAlbumById(artistId, albumId);
 
             album.Title = updateAlbumDto.Title;
             album.Length = updateAlbumDto.Length;
@@ -55,11 +50,7 @@ namespace MusicStoreApi.Services
 
         public void Delete(int artistId, int albumId)
         {
-            var album = dbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-
-            if (album is null) throw new NotFoundException("Artist and Album not found");
+            var album = GetAlbumById(artistId, albumId);
 
             string title = album.Title;
             dbContext.Albums.Remove(album);
@@ -70,8 +61,7 @@ namespace MusicStoreApi.Services
 
         public List<AlbumDto> GetAll(int artistId)
         {
-            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId);
-            if (artist == null) throw new NotFoundException("Artist not found");
+            GetArtistById(artistId);
 
             var albums = dbContext.Albums
                 .Include(s => s.Songs)
@@ -86,15 +76,27 @@ namespace MusicStoreApi.Services
 
         public AlbumDto GetById(int artistId, int albumId)
         {
-            var album = dbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            
-            if (album is null) throw new NotFoundException("Artist and Album not found");
+            var album = GetAlbumById(artistId, albumId);
 
             var albumDto = mapper.Map<AlbumDto>(album);
 
             return albumDto;
+        }
+
+        private Artist GetArtistById(int artistId)
+        {
+            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId);
+            if (artist == null) throw new NotFoundException("Artist not found");
+            return artist;
+        }
+
+        private Album GetAlbumById(int artistId, int albumId)
+        {
+            var album = dbContext.Albums
+                .Include(s => s.Songs)
+                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+            if (album is null) throw new NotFoundException("Artist and Album not found");
+            return album;
         }
     }
 }
