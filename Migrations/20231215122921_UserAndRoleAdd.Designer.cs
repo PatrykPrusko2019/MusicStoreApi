@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicStoreApi.Entities;
 
@@ -11,9 +12,11 @@ using MusicStoreApi.Entities;
 namespace MusicStoreApi.Migrations
 {
     [DbContext(typeof(ArtistDbContext))]
-    partial class ArtistDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231215122921_UserAndRoleAdd")]
+    partial class UserAndRoleAdd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,9 +176,6 @@ namespace MusicStoreApi.Migrations
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Nationality")
                         .HasColumnType("nvarchar(max)");
 
@@ -184,6 +184,9 @@ namespace MusicStoreApi.Migrations
 
                     b.Property<int>("RoleId")
                         .HasColumnType("int");
+
+                    b.Property<string>("SecondName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 

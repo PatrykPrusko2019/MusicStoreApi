@@ -10,6 +10,8 @@ namespace MusicStoreApi.Entities
         public DbSet<Album> Albums { get; set;}
         public DbSet<Song>  Songs { get; set;}
         public DbSet<Address> Addresses { get; set;}
+        public DbSet<User> Users { get; set;}
+        public DbSet<Role>  Roles { get; set;}
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,6 +45,13 @@ namespace MusicStoreApi.Entities
                 .IsRequired()
                 .HasMaxLength(20);
 
+            modelBuilder.Entity<User>()
+                .Property(a => a.Email)
+                .IsRequired();
+
+            modelBuilder.Entity<Role>()
+                .Property(r => r.Name)
+                .IsRequired();
 
         }
 

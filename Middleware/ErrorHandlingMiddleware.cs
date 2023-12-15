@@ -17,6 +17,11 @@ namespace MusicStoreApi.Middleware
             {
                 await next.Invoke(context);
             }
+            catch(BadRequestException badReguestException)
+            {
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync(badReguestException.Message);
+            }
             catch(NotFoundException notFoundException)
             {
                 context.Response.StatusCode = 404;
