@@ -57,6 +57,7 @@ public class Program
             builder.Services.AddScoped<IAccountService, AccountService>();
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
+            builder.Services.AddScoped<IValidator<LoginDto>, LoginUserDtoValidator>();
             builder.Services.AddScoped<ErrorHandlingMiddleware>();
             builder.Services.AddScoped<RequestTimeMiddleware>();
             builder.Services.AddSwaggerGen();

@@ -52,17 +52,9 @@ namespace MusicStoreApi.Services
                 .Include(u => u.Role)
                 .FirstOrDefault(u => u.Email == loginDto.Email);
 
-            if (user is null)
-            {
-                throw new BadRequestException("Invalid username or password");
-            }
-
             var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
-            if (result == PasswordVerificationResult.Failed)
-            {
-                throw new BadRequestException("Invalid username or password");
-            }
-
+            if (result == PasswordVerificationResult.Failed) throw new BadRequestException("Password: Invalid password");
+            
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
