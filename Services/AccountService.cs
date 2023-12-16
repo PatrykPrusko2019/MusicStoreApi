@@ -53,8 +53,8 @@ namespace MusicStoreApi.Services
                 .FirstOrDefault(u => u.Email == loginDto.Email);
 
             var result = passwordHasher.VerifyHashedPassword(user, user.PasswordHash, loginDto.Password);
-            if (result == PasswordVerificationResult.Failed) throw new BadRequestException("Password: Invalid password");
-            
+            if (result == PasswordVerificationResult.Failed) throw new BadRequestException("Invalid username or password"); //There is no precise information that this is an incorrect passwordHash, for the security of data of customers using a given application.
+
             var claims = new List<Claim>()
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),

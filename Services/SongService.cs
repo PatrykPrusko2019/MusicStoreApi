@@ -28,10 +28,11 @@ namespace MusicStoreApi.Services
             var songEntity = mapper.Map<Song>(createSongDto);
             songEntity.AlbumId = album.Id;
 
+            CheckIsCorrectNumberOfSongs(album, 1);
             artistDbContext.Songs.Add(songEntity);
             artistDbContext.SaveChanges();
-            logger.LogInformation($"Created new album: {songEntity.Name} , api/artist/{artistId}/album/{albumId}/song/{songEntity.Id}");
 
+            logger.LogInformation($"Created new song: {songEntity.Name} , api/artist/{artistId}/album/{albumId}/song/{songEntity.Id}");
             return songEntity.Id;
         }
 
@@ -55,9 +56,11 @@ namespace MusicStoreApi.Services
             var deleteSong = album.Songs.FirstOrDefault(s => s.Id == songId);
             if (deleteSong is null) throw new NotFoundException("Song not found");
 
+            CheckIsCorrectNumberOfSongs(album, -1);
             string name = deleteSong.Name;
             artistDbContext.Songs.Remove(deleteSong);
             artistDbContext.SaveChanges();
+
             logger.LogInformation($"Removed song: {name} , api/artist/{artistId}/album/{albumId}/song/{songId}");
         }
 
@@ -82,24 +85,27 @@ namespace MusicStoreApi.Services
 
         private Album GetAlbumById(int artistId, int albumId, int selectedOption)
         {
-            Album album = null;
+            Album album = artistDbContext.Albums
+                .Include(s => s.Songs)
+                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+
             switch (selectedOption)
             {
                 case 1:
-                    album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
                     if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
                     break;
 
                 case 2:
-                    album = artistDbContext.Albums
-                .Include(s => s.Songs)
-                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
                     if (album == null) { throw new NotFoundException("Artist, Album not found"); }
                     break;
             }
             return album;
+        }
+
+        private void CheckIsCorrectNumberOfSongs(Album album, int counter)
+        {
+            if (album.Songs is not null) album.NumberOfSongs = album.Songs.Count + counter;
+            else album.NumberOfSongs = 0;
         }
 
     }

@@ -41,7 +41,6 @@ namespace MusicStoreApi.Services
 
             album.Title = updateAlbumDto.Title;
             album.Length = updateAlbumDto.Length;
-            album.NumberOfSongs = updateAlbumDto.NumberOfSongs;
             album.Price = updateAlbumDto.Price;
 
             dbContext.SaveChanges();
