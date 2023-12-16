@@ -1,8 +1,10 @@
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using MusicStoreApi;
+using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Middleware;
 using MusicStoreApi.Models;
@@ -45,8 +47,9 @@ public class Program
                     ValidAudience = authenticationSettings.JwtIssuer,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(authenticationSettings.JwtKey))
                 };
-            });    
+            });
 
+            builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
             builder.Services.AddControllers().AddFluentValidation();
             builder.Services.AddDbContext<ArtistDbContext>();
             builder.Services.AddScoped<ArtistSeeder>();
@@ -60,6 +63,8 @@ public class Program
             builder.Services.AddScoped<IValidator<LoginDto>, LoginUserDtoValidator>();
             builder.Services.AddScoped<ErrorHandlingMiddleware>();
             builder.Services.AddScoped<RequestTimeMiddleware>();
+            builder.Services.AddScoped<IUserContextService, UserContextService>();
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
@@ -79,7 +84,7 @@ public class Program
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "MusicStore API");
             });        
-
+            
             app.UseAuthorization();
 
             app.MapControllers();

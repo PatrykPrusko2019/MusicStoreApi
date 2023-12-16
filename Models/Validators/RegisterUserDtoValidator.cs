@@ -25,6 +25,10 @@ namespace MusicStoreApi.Models.Validators
                     }
                 });
 
+            RuleFor(f => f.FirstName).NotEmpty();
+            RuleFor(f => f.LastName).NotEmpty();
+
+
         }
     }
 }

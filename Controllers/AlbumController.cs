@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MusicStoreApi.Models;
 using MusicStoreApi.Services;
 
@@ -6,7 +7,7 @@ namespace MusicStoreApi.Controllers
 {
     [Route("api/artist/{artistId}/album")]
     [ApiController]
-
+    [Authorize]
     public class AlbumController : ControllerBase
     {
         private readonly IAlbumService albumService;
@@ -16,6 +17,7 @@ namespace MusicStoreApi.Controllers
             this.albumService = albumService;
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPost]
         public ActionResult Create([FromRoute] int artistId, [FromBody]CreateAlbumDto createAlbumDto)
         {
@@ -24,6 +26,7 @@ namespace MusicStoreApi.Controllers
             return Created($"/api/artist/{artistId}/album/{newAlbumId}", null);
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPut("{albumId}")]
         public ActionResult Update(int artistId, [FromRoute] int albumId, [FromBody]UpdateAlbumDto updateAlbumDto)
         {
@@ -32,6 +35,7 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{artistId}/album/{albumId}");
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpDelete("{albumId}")]
         public ActionResult Delete([FromRoute]int artistId, [FromRoute] int albumId) 
         {

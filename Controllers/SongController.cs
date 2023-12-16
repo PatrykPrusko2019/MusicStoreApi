@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Models;
 using MusicStoreApi.Services;
+using System.Data;
 
 namespace MusicStoreApi.Controllers
 {
     [Route("api/artist/{artistId}/album/{albumId}/song")]
     [ApiController]
+    [Authorize]
     public class SongController : ControllerBase
     {
         private readonly ISongService songService;
@@ -16,6 +19,7 @@ namespace MusicStoreApi.Controllers
             this.songService = songService;
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPost]
         public ActionResult Create([FromRoute]int artistId, [FromRoute]int albumId, [FromBody] CreateSongDto songDto)
         {
@@ -24,6 +28,7 @@ namespace MusicStoreApi.Controllers
             return Created($"/api/artist/{artistId}/album/{albumId}/song/{songId}", null);
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPut("{songId}")]
         public ActionResult Update([FromRoute]int artistId, [FromRoute]int albumId, [FromRoute]int songId, [FromBody]UpdateSongDto updateSongDto)
         {
@@ -32,6 +37,7 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{artistId}/album/{albumId}/song/{songId}");
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpDelete("{songId}")]
         public ActionResult Delete([FromRoute]int artistId, [FromRoute]int albumId, [FromRoute]int songId)
         {

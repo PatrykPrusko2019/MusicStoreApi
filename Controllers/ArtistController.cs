@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -6,11 +7,13 @@ using Microsoft.IdentityModel.Tokens;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Models;
 using MusicStoreApi.Services;
+using System.Security.Claims;
 
 namespace MusicStoreApi.Controllers
 {
     [Route("api/artist")]
     [ApiController]
+    [Authorize]
     public class ArtistController : ControllerBase
     {
 
@@ -21,6 +24,7 @@ namespace MusicStoreApi.Controllers
             this.artistService = artistService;
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPost]
         public ActionResult Create([FromBody] CreateArtistDto createdArtistDto)
         {
@@ -29,6 +33,7 @@ namespace MusicStoreApi.Controllers
             return Created($"/api/artist/{id}", null);
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpDelete("{id}")]
         public ActionResult Delete([FromRoute] int id)
         {
@@ -37,6 +42,7 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{id}");
         }
 
+        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPut("{id}")]
         public ActionResult Update([FromRoute]int id, [FromBody]UpdateArtistDto updateArtistDto)
         {

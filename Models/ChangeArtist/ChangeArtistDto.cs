@@ -12,7 +12,11 @@ namespace MusicStoreApi.Models.Change
         [MaxLength(50)]
         public string Description { get; set; }
         public string KindOfMusic { get; set; }
+
+        [EmailAddress]
         public string ContactEmail { get; set; }
+
+        [Phone]
         public string ContactNumber { get; set; }
 
         [Required]

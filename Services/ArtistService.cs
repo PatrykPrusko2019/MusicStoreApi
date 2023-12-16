@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
+using System.Security.Claims;
 
 namespace MusicStoreApi.Services
 {
@@ -11,17 +14,20 @@ namespace MusicStoreApi.Services
         private readonly ArtistDbContext dbContext;
         private readonly IMapper mapper;
         private readonly ILogger<ArtistService> logger;
+        private readonly IAuthorizationService authorizationService;
 
-        public ArtistService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger)
+        public ArtistService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger, IAuthorizationService authorizationService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.logger = logger;
+            this.authorizationService = authorizationService;
         }
 
-        public int Create(CreateArtistDto createdArtistDto)
+        public int Create(CreateArtistDto createdArtistDto, int userId)
         {
             var createdArtist = mapper.Map<Artist>(createdArtistDto);
+            createdArtist.CreatedById = userId;
             dbContext.Artists.Add(createdArtist);
             dbContext.SaveChanges();
             logger.LogInformation($"Created new artist: {createdArtist.Name} , api/artist/{createdArtist.Id}");
@@ -29,11 +35,18 @@ namespace MusicStoreApi.Services
             return createdArtist.Id;
         }
 
-        public void Delete(int id)
+        public void Delete(int id, ClaimsPrincipal user)
         {
             var deleteArtist = GetArtistById(id);
 
             string name = deleteArtist.Name;
+
+            var authorizationResult = authorizationService.AuthorizeAsync(user, deleteArtist, new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
 
             dbContext.Artists.Remove(deleteArtist);
             dbContext.SaveChanges();
@@ -84,11 +97,18 @@ namespace MusicStoreApi.Services
             return artistDto;
         }
 
-        public void Update(int id, UpdateArtistDto updatedArtistDto)
+        public void Update(int id, UpdateArtistDto updatedArtistDto, ClaimsPrincipal user) 
         {
             var artist = GetArtistById(id);
 
             artist.Address = dbContext.Addresses.FirstOrDefault(a => a.Id == id);
+
+            var authorizationResult = authorizationService.AuthorizeAsync(user, artist, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
 
             artist.Name = updatedArtistDto.Name;
             artist.Description = updatedArtistDto.Description;

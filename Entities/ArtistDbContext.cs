@@ -49,6 +49,14 @@ namespace MusicStoreApi.Entities
                 .Property(a => a.Email)
                 .IsRequired();
 
+            modelBuilder.Entity<User>()
+                .Property(a => a.FirstName)
+                .IsRequired();
+
+            modelBuilder.Entity<User>()
+                .Property(a => a.LastName)
+                .IsRequired();
+
             modelBuilder.Entity<Role>()
                 .Property(r => r.Name)
                 .IsRequired();

@@ -27,6 +27,8 @@ namespace MusicStoreApi.Services
         {
             var newUser = new User()
             {
+                FirstName = registerUserDto.FirstName,
+                LastName = registerUserDto.LastName,
                 Email = registerUserDto.Email,
                 DateOfBirth = registerUserDto.DateOfBirth,
                 Nationality = registerUserDto.Nationality,
