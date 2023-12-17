@@ -24,7 +24,6 @@ namespace MusicStoreApi.Controllers
             this.artistService = artistService;
         }
 
-        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPost]
         public ActionResult Create([FromBody] CreateArtistDto createdArtistDto)
         {
@@ -33,7 +32,6 @@ namespace MusicStoreApi.Controllers
             return Created($"/api/artist/{id}", null);
         }
 
-        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpDelete("{id}")]
         public ActionResult Delete([FromRoute] int id)
         {
@@ -42,7 +40,6 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{id}");
         }
 
-        [Authorize(Roles = "Admin,PremiumUser")]
         [HttpPut("{id}")]
         public ActionResult Update([FromRoute]int id, [FromBody]UpdateArtistDto updateArtistDto)
         {
@@ -51,11 +48,10 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{id}");
         }
 
-
         [HttpGet]
-        public ActionResult<IEnumerable<ArtistDto>> GetAll()
+        public ActionResult<IEnumerable<ArtistDto>> GetAll([FromQuery]ArtistQuery artistQuery)
         {
-            var artistsDtos = artistService.GetAll();
+            var artistsDtos = artistService.GetAll(artistQuery);
 
             return Ok(artistsDtos);
         }

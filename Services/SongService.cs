@@ -100,7 +100,7 @@ namespace MusicStoreApi.Services
 
             Song song = album.Songs.FirstOrDefault(s => s.AlbumId == albumId && s.Id == songId);
             
-            if (song == null) throw new NotFoundException(album.Songs.IsNullOrEmpty() ? "Songs not found" : $"Song {songId} is not found");
+            if (song == null) throw new NotFoundException($"Song {songId} is not found");
                   
             return song;
         }

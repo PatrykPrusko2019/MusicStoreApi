@@ -6,6 +6,7 @@ using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace MusicStoreApi.Services
@@ -71,11 +72,30 @@ namespace MusicStoreApi.Services
             logger.LogInformation($"Delete album: {title} , api/artist/{artistId}/album/{albumId}");
         }
 
-        public List<AlbumDto> GetAll(int artistId)
+        public List<AlbumDto> GetAll(int artistId, AlbumQuery searchQuery)
         {
             var albums = CheckIfIdIsCorrectAndGetAlbums(artistId, true);
 
-            var albumsDtos = mapper.Map<List<AlbumDto>>(albums);
+            var baseQuery = dbContext.Albums
+                .Include(a => a.Songs)
+                .Where(a => a.ArtistId == artistId)
+                .Where(a => searchQuery.SearchWord == null || a.Title.ToLower().Contains(searchQuery.SearchWord.ToLower()));
+
+            if (!string.IsNullOrEmpty(searchQuery.SortBy))
+            {
+                var columnsSelectors = new Dictionary<string, Expression<Func<Album, object>>>
+                {
+                    { nameof(Album.Title), a => a.Title }
+                };
+
+                var selectedColumn = columnsSelectors[searchQuery.SortBy];
+
+                baseQuery = searchQuery.SortDirection == SortDirection.ASC
+                    ? baseQuery.OrderBy(selectedColumn)
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
+
+            var albumsDtos = mapper.Map<List<AlbumDto>>(baseQuery);
 
             return albumsDtos;
         }

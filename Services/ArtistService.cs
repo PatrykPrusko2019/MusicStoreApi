@@ -5,6 +5,7 @@ using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
+using System.Linq.Expressions;
 using System.Security.Claims;
 
 namespace MusicStoreApi.Services
@@ -56,18 +57,50 @@ namespace MusicStoreApi.Services
 
         }
 
-        public List<ArtistDto> GetAll()
+        public PageResult<ArtistDto> GetAll(ArtistQuery searchQuery)
         {
-            var artists = dbContext.Artists
+            // .Skip(searchQuery.PageSize * (searchQuery.PageNumber - 1)) -> 5 * (2 - 1) = 10 -> skip 10 items
+            var baseQuery = dbContext.Artists
                 .Include(a => a.Address)
                 .Include(a => a.Albums)
+                .Where(a => searchQuery.SearchWord == null || (a.Name.ToLower().Contains(searchQuery.SearchWord.ToLower())
+                                               || a.Description.ToLower().Contains(searchQuery.SearchWord.ToLower())));
+
+            if (!string.IsNullOrEmpty(searchQuery.SortBy))
+            {
+                var columnsSelectors = new Dictionary<string, Expression<Func<Artist, object>>>
+                {
+                    { nameof(Artist.Name), a => a.Name },
+                    { nameof(Artist.Description), a => a.Description },
+                    { nameof(Artist.KindOfMusic), a => a.KindOfMusic },
+                };
+
+                var selectedColumn = columnsSelectors[searchQuery.SortBy];
+
+                baseQuery = searchQuery.SortDirection == SortDirection.ASC
+                    ? baseQuery.OrderBy(selectedColumn)
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
+
+            var artists = baseQuery
+                .Skip(searchQuery.PageSize * (searchQuery.PageNumber - 1))
+                .Take(searchQuery.PageSize)
                 .ToList();
 
-            if (artists is null || artists.Count == 0) throw new NotFoundException("list of artists is empty");
+            var totalItemsCount = baseQuery.Count();
+
+            if (totalItemsCount <= searchQuery.PageSize * (searchQuery.PageNumber - 1))
+            {
+
+                throw new BadRequestException($"search result items of Artists: {totalItemsCount} is too small or equal, because the number of skip: {searchQuery.PageSize * (searchQuery.PageNumber - 1)} "
+                                              + ", change the values in 'PageSize = 5, PageNumber = 1' , to see the result");
+            }
+
+            if (artists is null || artists.Count == 0) throw new NotFoundException(searchQuery.SearchWord == null ? "list of artists is empty" : $"searchWord not found: {searchQuery.SearchWord}");
 
             artists.ForEach(artist =>
             {
-                int count = 0;
+                int count = 0; 
                 while (artist.Albums.Count > count)
                 {
                     var searchSongs = dbContext.Songs.Where(s => s.AlbumId == artist.Albums[count].Id).ToList();
@@ -77,7 +110,9 @@ namespace MusicStoreApi.Services
 
             var artistsDtos = mapper.Map<List<ArtistDto>>(artists);
 
-            return artistsDtos;
+            var result = new PageResult<ArtistDto>(artistsDtos, totalItemsCount, searchQuery.PageSize, searchQuery.PageNumber);
+
+            return result;
         }
 
         public ArtistDto GetById(int id)

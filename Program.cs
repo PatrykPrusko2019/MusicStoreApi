@@ -61,6 +61,8 @@ public class Program
             builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
             builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
             builder.Services.AddScoped<IValidator<LoginDto>, LoginUserDtoValidator>();
+            builder.Services.AddScoped<IValidator<ArtistQuery>, ArtistQueryValidator>();
+            builder.Services.AddScoped<IValidator<AlbumQuery>, AlbumQueryValidator>();
             builder.Services.AddScoped<ErrorHandlingMiddleware>();
             builder.Services.AddScoped<RequestTimeMiddleware>();
             builder.Services.AddScoped<IUserContextService, UserContextService>();
