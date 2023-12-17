@@ -15,19 +15,26 @@ namespace MusicStoreApi.Services
         private readonly IMapper mapper;
         private readonly ILogger<ArtistService> logger;
         private readonly IAuthorizationService authorizationService;
+        private readonly IUserContextService userContextService;
 
-        public ArtistService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger, IAuthorizationService authorizationService)
+        public ArtistService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger, IAuthorizationService authorizationService, 
+            IUserContextService userContextService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.logger = logger;
             this.authorizationService = authorizationService;
+            this.userContextService = userContextService;
+                
         }
 
-        public int Create(CreateArtistDto createdArtistDto, int userId)
+        public int Create(CreateArtistDto createdArtistDto)
         {
             var createdArtist = mapper.Map<Artist>(createdArtistDto);
-            createdArtist.CreatedById = userId;
+            createdArtist.CreatedById = userContextService.GetUserId;
+
+            GetAuthorizationResult(createdArtist, ResourceOperation.Create);
+
             dbContext.Artists.Add(createdArtist);
             dbContext.SaveChanges();
             logger.LogInformation($"Created new artist: {createdArtist.Name} , api/artist/{createdArtist.Id}");
@@ -35,18 +42,13 @@ namespace MusicStoreApi.Services
             return createdArtist.Id;
         }
 
-        public void Delete(int id, ClaimsPrincipal user)
+        public void Delete(int id)
         {
             var deleteArtist = GetArtistById(id);
 
             string name = deleteArtist.Name;
 
-            var authorizationResult = authorizationService.AuthorizeAsync(user, deleteArtist, new ResourceOperationRequirement(ResourceOperation.Delete)).Result;
-
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException();
-            }
+            GetAuthorizationResult(deleteArtist, ResourceOperation.Delete);
 
             dbContext.Artists.Remove(deleteArtist);
             dbContext.SaveChanges();
@@ -61,7 +63,7 @@ namespace MusicStoreApi.Services
                 .Include(a => a.Albums)
                 .ToList();
 
-            if (artists is null || artists.Count == 0) return null;
+            if (artists is null || artists.Count == 0) throw new NotFoundException("list of artists is empty");
 
             artists.ForEach(artist =>
             {
@@ -97,18 +99,13 @@ namespace MusicStoreApi.Services
             return artistDto;
         }
 
-        public void Update(int id, UpdateArtistDto updatedArtistDto, ClaimsPrincipal user) 
+        public void Update(int id, UpdateArtistDto updatedArtistDto) 
         {
             var artist = GetArtistById(id);
 
             artist.Address = dbContext.Addresses.FirstOrDefault(a => a.Id == id);
 
-            var authorizationResult = authorizationService.AuthorizeAsync(user, artist, new ResourceOperationRequirement(ResourceOperation.Update)).Result;
-
-            if (!authorizationResult.Succeeded)
-            {
-                throw new ForbidException();
-            }
+            GetAuthorizationResult(artist, ResourceOperation.Update);
 
             artist.Name = updatedArtistDto.Name;
             artist.Description = updatedArtistDto.Description;
@@ -128,8 +125,18 @@ namespace MusicStoreApi.Services
                 .Include(a => a.Address)
                 .Include(a => a.Albums)
                 .FirstOrDefault(a => a.Id == artistId);
-            if (artist is null) throw new NotFoundException("Artist not found");
+            if (artist is null) throw new NotFoundException($"Artist {artistId} is not found");
             return artist;
+        }
+
+        private void GetAuthorizationResult(Artist deleteArtist, ResourceOperation delete)
+        {
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, deleteArtist, new ResourceOperationRequirement(delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
         }
     }
 }

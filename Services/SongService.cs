@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
@@ -13,22 +15,28 @@ namespace MusicStoreApi.Services
         private readonly ArtistDbContext artistDbContext;
         private readonly IMapper mapper;
         private readonly ILogger<SongService> logger;
+        private readonly IAuthorizationService authorizationService;
+        private readonly IUserContextService userContextService;
 
-        public SongService(ArtistDbContext artistDbContext, IMapper mapper, ILogger<SongService> logger)
+        public SongService(ArtistDbContext artistDbContext, IMapper mapper, ILogger<SongService> logger, IAuthorizationService authorizationService, IUserContextService userContextService)
         {
             this.artistDbContext = artistDbContext;
             this.mapper = mapper;
             this.logger = logger;
+            this.authorizationService = authorizationService;
+            this.userContextService = userContextService;
         }
 
         public int Create(int artistId, int albumId, CreateSongDto createSongDto)
         {
-            var album = GetAlbumById(artistId, albumId, 2);
+            GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
+
+            CheckIfIdIsCorrectAndGetSongs(artistId, albumId, false);
 
             var songEntity = mapper.Map<Song>(createSongDto);
-            songEntity.AlbumId = album.Id;
+            songEntity.AlbumId = albumId;
 
-            CheckIsCorrectNumberOfSongs(album, 1);
+            CheckIsCorrectNumberOfSongs(albumId, 1);
             artistDbContext.Songs.Add(songEntity);
             artistDbContext.SaveChanges();
 
@@ -38,10 +46,9 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, int songId, UpdateSongDto createSongDto)
         {
-            var album = GetAlbumById(artistId, albumId, 1);
+            GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
 
-            var song = album.Songs.FirstOrDefault(s => s.Id == songId);
-            if (song is null) throw new NotFoundException("Song not found");
+            var song = GetSongById(artistId, albumId, songId, false);
 
             song.Name = createSongDto.Name;
 
@@ -51,12 +58,11 @@ namespace MusicStoreApi.Services
 
         public void Delete(int artistId, int albumId, int songId)
         {
-            var album = GetAlbumById(artistId, albumId, 1);
+            GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
-            var deleteSong = album.Songs.FirstOrDefault(s => s.Id == songId);
-            if (deleteSong is null) throw new NotFoundException("Song not found");
+            var deleteSong = GetSongById(artistId, albumId, songId, false);
 
-            CheckIsCorrectNumberOfSongs(album, -1);
+            CheckIsCorrectNumberOfSongs(albumId, -1);
             string name = deleteSong.Name;
             artistDbContext.Songs.Remove(deleteSong);
             artistDbContext.SaveChanges();
@@ -66,46 +72,70 @@ namespace MusicStoreApi.Services
 
         public List<SongDto> GetAll(int artistId, int albumId) 
         {
-            var album = GetAlbumById(artistId, albumId, 1);
+            var songs = CheckIfIdIsCorrectAndGetSongs(artistId, albumId, true);
 
-            var songsDtos = mapper.Map<List<SongDto>>(album.Songs);
+            var songsDtos = mapper.Map<List<SongDto>>(songs);
             return songsDtos;
         }
 
         public SongDto GetById(int artistId, int albumId, int songId)
         {
-            var album = GetAlbumById(artistId, albumId, 1);
-
-            var song = album.Songs.FirstOrDefault(s => s.Id == songId);
-            if (song is null) throw new NotFoundException("Song not found");
+            var song = GetSongById(artistId, albumId, songId, false);
 
             var songDto = mapper.Map<SongDto>(song);
             return songDto;
         }
 
-        private Album GetAlbumById(int artistId, int albumId, int selectedOption)
+        private Song GetSongById(int artistId, int albumId, int songId, bool isGetSongsOrIsCheckId)
         {
+            Artist artist = artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId);
+            if (artist == null) throw new NotFoundException($"Artist {artistId} is not found");
+
             Album album = artistDbContext.Albums
                 .Include(s => s.Songs)
                 .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+            if (album == null) throw new NotFoundException($"Album {albumId} is not found");
 
-            switch (selectedOption)
-            {
-                case 1:
-                    if (album is null || album.Songs.IsNullOrEmpty()) throw new NotFoundException("Artist, Album, Song not found");
-                    break;
+            if (isGetSongsOrIsCheckId) return new Song();
 
-                case 2:
-                    if (album == null) { throw new NotFoundException("Artist, Album not found"); }
-                    break;
-            }
-            return album;
+            Song song = album.Songs.FirstOrDefault(s => s.AlbumId == albumId && s.Id == songId);
+            
+            if (song == null) throw new NotFoundException(album.Songs.IsNullOrEmpty() ? "Songs not found" : $"Song {songId} is not found");
+                  
+            return song;
         }
 
-        private void CheckIsCorrectNumberOfSongs(Album album, int counter)
+        private List<Song> CheckIfIdIsCorrectAndGetSongs(int artistId, int albumId, bool isGetSongsOrIsCheckId)
         {
+            GetSongById(artistId, albumId, 0, true); // checks if ids numbers are correct
+
+            if (isGetSongsOrIsCheckId)
+            {
+                var album = artistDbContext.Albums
+                    .Include (s => s.Songs)
+                    .FirstOrDefault(a => a.Id == albumId);
+                if (album.Songs.IsNullOrEmpty()) throw new NotFoundException("list of songs is empty");
+                else return album.Songs;
+            }
+
+            return null;
+        }
+
+        private void CheckIsCorrectNumberOfSongs(int albumId, int counter)
+        {
+            Album album = artistDbContext.Albums.FirstOrDefault(a => a.Id == albumId);
             if (album.Songs is not null) album.NumberOfSongs = album.Songs.Count + counter;
             else album.NumberOfSongs = 0;
+        }
+
+        private void GetAuthorizationResult(Artist deleteArtist, ResourceOperation delete)
+        {
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, deleteArtist, new ResourceOperationRequirement(delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
         }
 
     }

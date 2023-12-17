@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
@@ -12,18 +15,24 @@ namespace MusicStoreApi.Services
         private readonly ArtistDbContext dbContext;
         private readonly IMapper mapper;
         private readonly ILogger<ArtistService> logger;
+        private readonly IUserContextService userContextService;
+        private readonly IAuthorizationService authorizationService;
 
-        public AlbumService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger)
+        public AlbumService(ArtistDbContext dbContext, IMapper mapper, ILogger<ArtistService> logger, IUserContextService userContextService, IAuthorizationService authorizationService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.logger = logger;
+            this.userContextService = userContextService;
+            this.authorizationService = authorizationService;    
         }
 
        
         public int Create(int artistId, CreateAlbumDto createAlbumDto)
         {
-            GetArtistById(artistId);
+            GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
+
+            CheckIfIdIsCorrectAndGetAlbums(artistId, false);
 
             var albumEntity = mapper.Map<Album>(createAlbumDto);
 
@@ -37,7 +46,9 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, UpdateAlbumDto updateAlbumDto)
         {
-            var album = GetAlbumById(artistId, albumId);
+            GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
+
+            var album = GetAlbumById(artistId, albumId, false);
 
             album.Title = updateAlbumDto.Title;
             album.Length = updateAlbumDto.Length;
@@ -49,7 +60,9 @@ namespace MusicStoreApi.Services
 
         public void Delete(int artistId, int albumId)
         {
-            var album = GetAlbumById(artistId, albumId);
+            GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
+
+            var album = GetAlbumById(artistId, albumId, false);
 
             string title = album.Title;
             dbContext.Albums.Remove(album);
@@ -60,13 +73,7 @@ namespace MusicStoreApi.Services
 
         public List<AlbumDto> GetAll(int artistId)
         {
-            GetArtistById(artistId);
-
-            var albums = dbContext.Albums
-                .Include(s => s.Songs)
-                .Where(a => a.ArtistId == artistId).ToList();
-
-            if (albums is null || albums.Count == 0) throw new NotFoundException("Album not found");
+            var albums = CheckIfIdIsCorrectAndGetAlbums(artistId, true);
 
             var albumsDtos = mapper.Map<List<AlbumDto>>(albums);
 
@@ -75,27 +82,53 @@ namespace MusicStoreApi.Services
 
         public AlbumDto GetById(int artistId, int albumId)
         {
-            var album = GetAlbumById(artistId, albumId);
+            var album = GetAlbumById(artistId, albumId, false);
 
             var albumDto = mapper.Map<AlbumDto>(album);
 
             return albumDto;
         }
 
-        private Artist GetArtistById(int artistId)
+        private Album GetAlbumById(int artistId, int albumId, bool isGetSongsOrIsCheckId)
         {
-            var artist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId);
-            if (artist == null) throw new NotFoundException("Artist not found");
-            return artist;
-        }
+            Artist artist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId);
+            if (artist == null) throw new NotFoundException($"Artist {artistId} is not found");
 
-        private Album GetAlbumById(int artistId, int albumId)
-        {
-            var album = dbContext.Albums
+            if (isGetSongsOrIsCheckId) return null;
+
+            Album album = dbContext.Albums
                 .Include(s => s.Songs)
                 .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
-            if (album is null) throw new NotFoundException("Artist and Album not found");
+            if (album == null) throw new NotFoundException($"Album {albumId} is not found");
+
             return album;
+        }
+
+        private List<Album> CheckIfIdIsCorrectAndGetAlbums(int artistId,  bool isGetAlbumsOrIsCheckId)
+        {
+            GetAlbumById(artistId, 0, true); // checks if ids numbers are correct
+
+            if (isGetAlbumsOrIsCheckId)
+            {
+                var albums = dbContext.Albums
+                    .Include(s => s.Songs)
+                    .Where(a => a.ArtistId == artistId).ToList();
+                if (albums.IsNullOrEmpty()) throw new NotFoundException("list of albums is empty");
+                else return albums;
+            }
+
+            return null;
+        }
+
+        
+        private void GetAuthorizationResult(Artist deleteArtist, ResourceOperation delete)
+        {
+            var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, deleteArtist, new ResourceOperationRequirement(delete)).Result;
+
+            if (!authorizationResult.Succeeded)
+            {
+                throw new ForbidException();
+            }
         }
     }
 }
