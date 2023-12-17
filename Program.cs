@@ -1,19 +1,18 @@
 using FluentValidation;
-using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using NLog.Web;
+using System.Text;
+using FluentValidation.AspNetCore;
+using System.Reflection;
 using MusicStoreApi;
-using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
-using MusicStoreApi.Middleware;
+using MusicStoreApi.Authorization;
+using MusicStoreApi.Services;
 using MusicStoreApi.Models;
 using MusicStoreApi.Models.Validators;
-using MusicStoreApi.Services;
-using NLog.Web;
-using System.Reflection;
-using System.Text;
-using System.Text.Unicode;
+using MusicStoreApi.Middleware;
 
 public class Program
     {
@@ -24,7 +23,7 @@ public class Program
             // NLog: Setup Nlog for Dependency injection
             builder.Logging.ClearProviders();
             builder.Host.UseNLog();
-
+        
         // Add services to the container.
 
             var authenticationSettings = new AuthenticationSettings();
@@ -68,14 +67,26 @@ public class Program
             builder.Services.AddScoped<IUserContextService, UserContextService>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("FrontEndClient", policyBuilder =>
+
+                policyBuilder.AllowAnyMethod()
+                .AllowAnyHeader()
+                .WithOrigins(builder.Configuration["AllowedOrigins"])
+                );
+            });
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline.
+            app.UseStaticFiles();
             var scope = app.Services.CreateScope();
             var seeder = scope.ServiceProvider.GetRequiredService<ArtistSeeder>();
             seeder.Seed();
 
+            
+            app.UseCors("FrontEndClient");
             app.UseMiddleware<ErrorHandlingMiddleware>();
             app.UseMiddleware<RequestTimeMiddleware>();
             app.UseAuthentication();
