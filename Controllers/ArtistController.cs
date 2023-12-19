@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -48,6 +47,7 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{id}");
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult<IEnumerable<ArtistDto>> GetAll([FromQuery]ArtistQuery artistQuery)
         {
@@ -56,6 +56,7 @@ namespace MusicStoreApi.Controllers
             return Ok(artistsDtos);
         }
 
+        [AllowAnonymous]
         [HttpGet("{id}")]
         public ActionResult<ArtistDto> Get([FromRoute] int id)
         

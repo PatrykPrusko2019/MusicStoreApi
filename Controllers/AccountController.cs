@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MusicStoreApi.Entities;
 using MusicStoreApi.Models;
 using MusicStoreApi.Services;
 

@@ -41,6 +41,7 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{artistId}/album/{albumId}");
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult<List<AlbumDto>> GetAll([FromRoute]int artistId, [FromQuery] AlbumQuery albumQuery) 
         {
@@ -49,6 +50,7 @@ namespace MusicStoreApi.Controllers
             return Ok(albums);
         }
 
+        [AllowAnonymous]
         [HttpGet("{albumId}")]
         public ActionResult GetById([FromRoute] int artistId, [FromRoute]int albumId)
         {
