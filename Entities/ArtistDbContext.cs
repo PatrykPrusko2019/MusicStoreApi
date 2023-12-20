@@ -6,7 +6,9 @@ namespace MusicStoreApi.Entities
 {
     public class ArtistDbContext : DbContext
     {
-        private string _connectionString = "Server=DESKTOP-09DCRPN;Database=MusicStoreDb;Trusted_Connection=True;TrustServerCertificate=True";
+        public ArtistDbContext(DbContextOptions<ArtistDbContext> options) : base(options) { }
+
+        // private string _connectionString = "Server=DESKTOP-09DCRPN;Database=MusicStoreDb;Trusted_Connection=True;TrustServerCertificate=True;";
         public DbSet<Artist> Artists { get; set;}
         public DbSet<Album> Albums { get; set;}
         public DbSet<Song>  Songs { get; set;}
@@ -63,9 +65,9 @@ namespace MusicStoreApi.Entities
                 .IsRequired();
 
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_connectionString);
-        }
+        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        //{
+        //    optionsBuilder.UseSqlServer(Program.ConnectionStrings);
+        //}
     }
 }

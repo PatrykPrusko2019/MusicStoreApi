@@ -7,6 +7,7 @@ namespace MusicStoreApi
         private readonly ArtistDbContext _dbContext;
         private List<string> NamesArtists = new List<string>() { "Iron Maiden", "Offspring", "Korn", "Metallica", "ACDC", "Dzem", "Sepultura", "Green Day", "Vergin", "Venflon"};
 
+
         public ArtistSeeder(ArtistDbContext artistDbContext)
         {
             _dbContext = artistDbContext;

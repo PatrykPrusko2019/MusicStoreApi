@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class Program
     {
-        public static void Main(string[] args)
+    public static void Main(string[] args)
         {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +52,9 @@ public class Program
 
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
         builder.Services.AddControllers().AddFluentValidation();
+
+        builder.Services.AddDbContext<ArtistDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ArtistDbContext")));
+
         builder.Services.AddDbContext<ArtistDbContext>();
         builder.Services.AddScoped<ArtistSeeder>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
