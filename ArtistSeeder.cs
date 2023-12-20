@@ -1,4 +1,5 @@
-﻿using MusicStoreApi.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using MusicStoreApi.Entities;
 
 namespace MusicStoreApi
 {
@@ -17,6 +18,12 @@ namespace MusicStoreApi
         {
             if (_dbContext.Database.CanConnect())
             {
+                var pendingMigrations = _dbContext.Database.GetPendingMigrations();
+                if(pendingMigrations != null && pendingMigrations.Any() )
+                {
+                    _dbContext.Database.Migrate();
+                }
+
                 if (!_dbContext.Artists.Any())
                 {
                     var artists = GetArtists();
