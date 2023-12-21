@@ -20,4 +20,10 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
+ <system.webServer>
+      <aspNetCore xdt:Transform="SetAttributes(startupTimeLimit)" startupTimeLimit="500">
+      </aspNetCore>
+ </system.webServer>
+
+
 </Project>
