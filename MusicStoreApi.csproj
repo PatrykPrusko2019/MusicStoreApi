@@ -3,11 +3,14 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-
-    
-      <aspNetCore xdt:Transform="SetAttributes(startupTimeLimit)" startupTimeLimit="500">
-      </aspNetCore>
- 
+    Condition="'$(Configuration)|$(Platform)' == 'StagingQA|AnyCPU'">
+    <OutputPath>bin\StagingQA\</OutputPath>
+    <DefineConstants>TRACE;StagingQA</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,6 +27,8 @@
     <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.7" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
+
+
 
 
 
