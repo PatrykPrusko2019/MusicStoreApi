@@ -52,10 +52,6 @@ public class Program
 
         builder.Services.AddScoped<IAuthorizationHandler, ResourceOperationRequirementHandler>();
         builder.Services.AddControllers().AddFluentValidation();
-
-        builder.Services.AddDbContext<ArtistDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ArtistDbContext")));
-
-        builder.Services.AddDbContext<ArtistDbContext>();
         builder.Services.AddScoped<ArtistSeeder>();
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         builder.Services.AddScoped<IArtistService, ArtistService>();
@@ -84,6 +80,8 @@ public class Program
                 .WithOrigins(builder.Configuration["AllowedOrigins"])
                 );
         });
+
+        builder.Services.AddDbContext<ArtistDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("ArtistDbContext")));
 
         // Configure the HTTP request pipeline.
         var app = builder.Build();
