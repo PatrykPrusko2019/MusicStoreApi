@@ -3,14 +3,6 @@
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    Condition="'$(Configuration)|$(Platform)' == 'StagingQA|AnyCPU'">
-    <OutputPath>bin\StagingQA\</OutputPath>
-    <DefineConstants>TRACE;StagingQA</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +20,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
   </ItemGroup>
 
-
+<PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'StagingQA|AnyCPU'">
+    <OutputPath>bin\StagingQA\</OutputPath>
+    <DefineConstants>TRACE;StagingQA</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
 
 
 
