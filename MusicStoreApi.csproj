@@ -4,10 +4,10 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
 
-     <system.webServer>
+    
       <aspNetCore xdt:Transform="SetAttributes(startupTimeLimit)" startupTimeLimit="500">
       </aspNetCore>
- </system.webServer>
+ 
   </PropertyGroup>
 
   <ItemGroup>
