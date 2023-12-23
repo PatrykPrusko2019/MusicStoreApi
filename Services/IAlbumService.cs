@@ -6,7 +6,8 @@ namespace MusicStoreApi.Services
     {
         int Create(int artistId, CreateAlbumDto createAlbumDto);
         void Update(int artistId, int albumId, UpdateAlbumDto updateAlbumDto);
-        void Delete(int artistId, int albumId);
+        void DeleteAll(int artistId);
+        void DeleteById(int artistId, int albumId);
         List<AlbumDto> GetAll(int artistId, AlbumQuery searchQuery);
         AlbumDto GetById(int artistId , int albumId);
     }

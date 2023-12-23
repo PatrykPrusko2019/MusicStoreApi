@@ -31,9 +31,11 @@ namespace MusicStoreApi.Services
        
         public int Create(int artistId, CreateAlbumDto createAlbumDto)
         {
+            CheckIfIdIsCorrectAndGetAlbums(artistId, false);
+
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
 
-            CheckIfIdIsCorrectAndGetAlbums(artistId, false);
+            CheckIsUnigueTitle(artistId, createAlbumDto.Title);
 
             var albumEntity = mapper.Map<Album>(createAlbumDto);
 
@@ -47,9 +49,11 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, UpdateAlbumDto updateAlbumDto)
         {
+            var album = GetAlbumById(artistId, albumId, false);
+
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
 
-            var album = GetAlbumById(artistId, albumId, false);
+            CheckIsUnigueTitle(artistId, updateAlbumDto.Title);
 
             album.Title = updateAlbumDto.Title;
             album.Length = updateAlbumDto.Length;
@@ -59,17 +63,29 @@ namespace MusicStoreApi.Services
             logger.LogInformation($"Updated album: {album.Title} , api/artist/{artistId}/album/{album.Id}");
         }
 
-        public void Delete(int artistId, int albumId)
+        public void DeleteAll(int artistId)
         {
+            var removeAlbums = CheckIfIdIsCorrectAndGetAlbums(artistId, true);
+
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
+            foreach (var album in removeAlbums) dbContext.Albums.Remove(album);
+            
+            dbContext.SaveChanges();
+            logger.LogInformation($"Deleted all albums: api/artist/{artistId}");
+        }
+
+        public void DeleteById(int artistId, int albumId)
+        {
             var album = GetAlbumById(artistId, albumId, false);
+
+            GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
             string title = album.Title;
             dbContext.Albums.Remove(album);
 
             dbContext.SaveChanges();
-            logger.LogInformation($"Delete album: {title} , api/artist/{artistId}/album/{albumId}");
+            logger.LogInformation($"Deleted album: {title} , api/artist/{artistId}/album/{albumId}");
         }
 
         public List<AlbumDto> GetAll(int artistId, AlbumQuery searchQuery)
@@ -140,7 +156,6 @@ namespace MusicStoreApi.Services
             return null;
         }
 
-        
         private void GetAuthorizationResult(Artist deleteArtist, ResourceOperation delete)
         {
             var authorizationResult = authorizationService.AuthorizeAsync(userContextService.User, deleteArtist, new ResourceOperationRequirement(delete)).Result;
@@ -150,5 +165,19 @@ namespace MusicStoreApi.Services
                 throw new ForbidException();
             }
         }
+
+        private void CheckIsUnigueTitle(int artistId, string title)
+        {
+            var artist = dbContext.Artists
+                .Include(a => a.Albums)
+                .FirstOrDefault(a => a.Id == artistId);
+
+            if (artist.Albums.IsNullOrEmpty()) return;
+
+            var isDuplicate = artist.Albums.Any(a => a.Title == title);
+            if (isDuplicate) throw new DuplicateValueException("Title : value invalid, because is on the artist's list");
+        }
+
+
     }
 }

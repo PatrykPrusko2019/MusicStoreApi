@@ -33,10 +33,18 @@ namespace MusicStoreApi.Controllers
             return Ok($"/api/artist/{artistId}/album/{albumId}");
         }
 
-        [HttpDelete("{albumId}")]
-        public ActionResult Delete([FromRoute]int artistId, [FromRoute] int albumId) 
+        [HttpDelete]
+        public ActionResult DeleteAll([FromRoute] int artistId)
         {
-            albumService.Delete(artistId, albumId);
+            albumService.DeleteAll(artistId);
+
+            return Ok($"Deleted all albums: api/artist/{artistId}");
+        }
+
+        [HttpDelete("{albumId}")]
+        public ActionResult DeleteById([FromRoute]int artistId, [FromRoute] int albumId) 
+        {
+            albumService.DeleteById(artistId, albumId);
 
             return Ok($"/api/artist/{artistId}/album/{albumId}");
         }

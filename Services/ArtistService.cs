@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
@@ -31,6 +32,8 @@ namespace MusicStoreApi.Services
 
         public int Create(CreateArtistDto createdArtistDto)
         {
+            CheckIsUnigueName(createdArtistDto.Name);
+
             var createdArtist = mapper.Map<Artist>(createdArtistDto);
             createdArtist.CreatedById = userContextService.GetUserId;
 
@@ -172,6 +175,18 @@ namespace MusicStoreApi.Services
             {
                 throw new ForbidException();
             }
+        }
+
+        private void CheckIsUnigueName(string name)
+        {
+            var userId = int.Parse( userContextService.User.FindFirst(c => c.Type == ClaimTypes.NameIdentifier).Value );
+            
+            if (! dbContext.Artists.IsNullOrEmpty()) 
+            {
+                var isDuplicate = dbContext.Artists.Any(a => a.Name == name);
+                if (isDuplicate) throw new DuplicateValueException("Name : invalid value because there is already an artist created by this user (duplicate)");
+            }
+            
         }
     }
 }

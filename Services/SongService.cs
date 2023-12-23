@@ -29,9 +29,11 @@ namespace MusicStoreApi.Services
 
         public int Create(int artistId, int albumId, CreateSongDto createSongDto)
         {
+            CheckIfIdIsCorrectAndGetSongs(artistId, albumId, false);
+
             GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
 
-            CheckIfIdIsCorrectAndGetSongs(artistId, albumId, false);
+            CheckIsUnigueName(artistId,  albumId, createSongDto.Name);
 
             var songEntity = mapper.Map<Song>(createSongDto);
             songEntity.AlbumId = albumId;
@@ -46,9 +48,11 @@ namespace MusicStoreApi.Services
 
         public void Update(int artistId, int albumId, int songId, UpdateSongDto createSongDto)
         {
+            var song = GetSongById(artistId, albumId, songId, false);
+
             GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
 
-            var song = GetSongById(artistId, albumId, songId, false);
+            CheckIsUnigueName(artistId, albumId, createSongDto.Name);
 
             song.Name = createSongDto.Name;
 
@@ -56,11 +60,24 @@ namespace MusicStoreApi.Services
             logger.LogInformation($"Updated song: {song.Name} , api/artist/{artistId}/album/{albumId}/song/{song.Id}");
         }
 
-        public void Delete(int artistId, int albumId, int songId)
+        public void DeleteAll(int artistId, int albumId)
         {
+            var deleteSongs = CheckIfIdIsCorrectAndGetSongs(artistId, albumId, true);
+
             GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
+            CheckIsCorrectNumberOfSongs(albumId, 0);
+            foreach (var songs in deleteSongs) artistDbContext.Songs.Remove(songs);
+            artistDbContext.SaveChanges();
+
+            logger.LogInformation($"Removed song: api/artist/{artistId}/album/{albumId}");
+        }
+
+        public void DeleteById(int artistId, int albumId, int songId)
+        {
             var deleteSong = GetSongById(artistId, albumId, songId, false);
+
+            GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
             CheckIsCorrectNumberOfSongs(albumId, -1);
             string name = deleteSong.Name;
@@ -123,8 +140,8 @@ namespace MusicStoreApi.Services
 
         private void CheckIsCorrectNumberOfSongs(int albumId, int counter)
         {
-            Album album = artistDbContext.Albums.FirstOrDefault(a => a.Id == albumId);
-            if (album.Songs is not null) album.NumberOfSongs = album.Songs.Count + counter;
+            Album album = artistDbContext.Albums.Include(s => s.Songs).FirstOrDefault(a => a.Id == albumId);
+            if (counter != 0) album.NumberOfSongs = album.Songs.Count + counter;
             else album.NumberOfSongs = 0;
         }
 
@@ -136,6 +153,17 @@ namespace MusicStoreApi.Services
             {
                 throw new ForbidException();
             }
+        }
+
+        private void CheckIsUnigueName(int artistId, int albumId, string name)
+        {
+            var album = artistDbContext.Albums
+                .Include(s => s.Songs)
+                .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
+
+            if (album.Songs.IsNullOrEmpty()) return;
+            var isDuplicate = album.Songs.Any(a => a.Name == name);
+            if (isDuplicate) throw new DuplicateValueException("Name : value invalid, because is on the album's list");
         }
 
     }

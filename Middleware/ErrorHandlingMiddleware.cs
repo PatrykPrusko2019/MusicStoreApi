@@ -17,6 +17,11 @@ namespace MusicStoreApi.Middleware
             {
                 await next.Invoke(context);
             }
+            catch(DuplicateValueException duplicateValueException)
+            {
+                context.Response.StatusCode = 409;
+                await context.Response.WriteAsync(duplicateValueException.Message);
+            }
             catch(ForbidException forbidException)
             {
                 context.Response.StatusCode = 403;
