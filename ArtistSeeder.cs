@@ -85,7 +85,6 @@ namespace MusicStoreApi
                         KindOfMusic = $"rock, metal {count}",
                         ContactEmail = $"contact@email{count}.com",
                         ContactNumber = $"98742385{count}",
-                        CreatedBy = user,
                         CreatedById = user.Id,
                         Albums = new List<Album>()
                         {

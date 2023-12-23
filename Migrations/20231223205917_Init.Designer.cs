@@ -12,8 +12,8 @@ using MusicStoreApi.Entities;
 namespace MusicStoreApi.Migrations
 {
     [DbContext(typeof(ArtistDbContext))]
-    [Migration("20231223174051_LastVersion2")]
-    partial class LastVersion2
+    [Migration("20231223205917_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
