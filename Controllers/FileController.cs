@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.StaticFiles;
 namespace MusicStoreApi.Controllers
 {
     [Route("file")]
-    //[Authorize]
+    [Authorize]
     public class FileController : ControllerBase
     {
         [HttpGet]
@@ -30,24 +30,24 @@ namespace MusicStoreApi.Controllers
             return File(fileContents, contentType, fileName);
         }
 
-        [HttpPost]
-        public ActionResult Upload([FromForm] IFormFile file)
-        {
-            if (file != null && file.Length > 0)
-            {
-                var rootPath = Directory.GetCurrentDirectory();
-                var fileName = file.FileName;
-                var fullPath = $"{rootPath}/PrivateFiles/{fileName}";
+        //[HttpPost]
+        //public ActionResult Upload([FromForm] IFormFile file)
+        //{
+        //    if (file != null && file.Length > 0)
+        //    {
+        //        var rootPath = Directory.GetCurrentDirectory();
+        //        var fileName = file.FileName;
+        //        var fullPath = $"{rootPath}/PrivateFiles/{fileName}";
 
-                using (var stream = new FileStream(fullPath, FileMode.Create)) //saved to server
-                {
-                    file.CopyTo(stream);
-                }
+        //        using (var stream = new FileStream(fullPath, FileMode.Create)) //saved to server
+        //        {
+        //            file.CopyTo(stream);
+        //        }
 
-                return Ok();
-            }
+        //        return Ok();
+        //    }
 
-            return BadRequest();
-        }
+        //    return BadRequest();
+        //}
     }
 }

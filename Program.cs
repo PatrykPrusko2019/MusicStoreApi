@@ -109,7 +109,7 @@ public class Program
         app.UseSwaggerUI(c =>
         {
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "MusicStore API");
-            // c.RoutePrefix = string.Empty;
+            c.RoutePrefix = string.Empty;
         });
 
         app.UseRouting();

@@ -145,6 +145,8 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(artist, ResourceOperation.Update);
 
+            CheckIsUnigueName(updatedArtistDto.Name);
+
             artist.Name = updatedArtistDto.Name;
             artist.Description = updatedArtistDto.Description;
             artist.KindOfMusic = updatedArtistDto.KindOfMusic;

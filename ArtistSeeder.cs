@@ -32,13 +32,6 @@ namespace MusicStoreApi
                 _dbContext.SaveChanges();
             }
 
-            if (!_dbContext.Users.Any())
-            {
-                var users = GetUsers();
-                _dbContext.Users.AddRange(users);
-                _dbContext.SaveChanges();
-            }
-
             if (!_dbContext.Artists.Any())
             {
                 var artists = GetArtists();
@@ -150,45 +143,6 @@ namespace MusicStoreApi
             }
             return artists;
         }
-
-        private IEnumerable<User> GetUsers()
-        {
-            var users = new List<User>()
-            {
-                new User() 
-                {
-                    Email = "user@gmail.com",
-                    FirstName = "Adam",
-                    LastName = "Ciska",
-                    DateOfBirth = new DateTime(1990, 1, 1),
-                    Nationality = "Polish",
-                    PasswordHash = "AQAAAAIAAYagAAAAELZ0WsgVpKqiOuq0p71A3FElecFHLyovnucnYIZo3rtCOPzD6LV1jjuxiT/IPBg3oQ==",
-                    RoleId = 1
-                },
-                new User()
-                {
-                    Email = "premiumuser@gmail.com",
-                    FirstName = "Blazej",
-                    LastName = "Mana",
-                    DateOfBirth = new DateTime(1987, 5, 6),
-                    Nationality = "Polish",
-                    PasswordHash = "AQAAAAIAAYagAAAAEF6eiowEI+NHdELuR43kc5QmPeyAcjAtT7bwCdIPZrntS1XLjefrLaCHttbz62mLWg==",
-                    RoleId = 2
-                },
-                new User()
-                {
-                    Email = "admin@gmail.com",
-                    FirstName = "Grzegorz",
-                    LastName = "Rybka",
-                    DateOfBirth = new DateTime(2000, 2, 3),
-                    Nationality = "Greek",
-                    PasswordHash = "AQAAAAIAAYagAAAAEIzlKkobOYvA14lhndufA7pNJVUdpnxRMbhu4mrp+Y91tH+wyNLhDFJKTX494+JGlA==",
-                    RoleId = 3
-                }
-            };
-            return users;
-        }
-
 
     }
 }
