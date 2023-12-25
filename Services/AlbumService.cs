@@ -175,7 +175,7 @@ namespace MusicStoreApi.Services
             if (artist.Albums.IsNullOrEmpty()) return;
 
             var isDuplicate = artist.Albums.Any(a => a.Title == title);
-            if (isDuplicate) throw new DuplicateValueException("Title : value invalid, because is on the artist's list");
+            if (isDuplicate) throw new DuplicateValueException("Title : value invalid, because is on the album's list");
         }
 
 

@@ -8,6 +8,7 @@ using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
 using System.Linq.Expressions;
 using System.Security.Claims;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace MusicStoreApi.Services
 {
@@ -185,8 +186,8 @@ namespace MusicStoreApi.Services
             
             if (! dbContext.Artists.IsNullOrEmpty()) 
             {
-                var isDuplicate = dbContext.Artists.Any(a => a.Name == name);
-                if (isDuplicate) throw new DuplicateValueException("Name : invalid value because there is already an artist created by this user (duplicate)");
+                var isDuplicate = dbContext.Artists.Any(a => a.Name == name && a.CreatedById == userId);
+                if (isDuplicate) throw new DuplicateValueException("Name: invalid value because there is already an artist created by this user (duplicate)");
             }
             
         }

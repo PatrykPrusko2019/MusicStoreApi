@@ -163,7 +163,7 @@ namespace MusicStoreApi.Services
 
             if (album.Songs.IsNullOrEmpty()) return;
             var isDuplicate = album.Songs.Any(a => a.Name == name);
-            if (isDuplicate) throw new DuplicateValueException("Name : value invalid, because is on the album's list");
+            if (isDuplicate) throw new DuplicateValueException("Name : value invalid, because is on the songs's list");
         }
 
     }

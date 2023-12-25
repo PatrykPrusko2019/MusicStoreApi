@@ -16,7 +16,7 @@ namespace MusicStoreApi.Models.Validators
             { 
                 if (!allowedPageSizes.Contains(searchPageSize))
                 {
-                    context.AddFailure("PageSise", $"PageSize must in [{string.Join(",", allowedPageSizes)}]");
+                    context.AddFailure("PageSize", $"PageSize must in [{string.Join(",", allowedPageSizes)}]");
                 }
 
             });
