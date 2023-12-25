@@ -118,5 +118,5 @@ Use of middleware as ErrorHandlingMiddleware class, which is responsible for ana
 
 A CORS policy has been added so that in future queries can be sent to a particular api, from a different frontend domain. 
 
-Deployed application to Azure cloud : https://musicstore-api-app9.azurewebsites.net/index.html
+Deployed application to Azure cloud : https://musicstore-api-app9.azurewebsites.net/swagger
 
