@@ -126,26 +126,35 @@ There are also 4 additional Users created:
 login/email: user2@gmail.com
 password: password1
 
-Authorization =
-Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjQiLCJod HRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlciB1c2VyIiwiaHR0cDovL3NjaGVtYXMubWljcm9zb2Z0LmNvbS93cy8yMDA4Lz A2L2lkZW50aXR5L2NsYWltcy9yb2xlIjoiVXNlciIsIkRhdGVPZkJpcnRoIjoiMjAwMC0xMi0yOCIsIk5hdGlvbmFsaXR5IjoiUG9saXNoIiwiZXhwIjoxNzA1MDYwNjUyLCJpc3MiOiJodHRw Oi8vbXVzaWNzdG9yZWFwaS5jb20iLCJhdWQiOiJodHRwOi8vbXVzaWNzdG9yZWFwaS5jb20ifQ.f4d3854kDETp5iUxTbHtyvAvvTUOoTERASYO0BF2lxA
+in Parameter in Postman -> Authorization = Bearer {Token JWT}
 
-2. PREMIUM_USER about the role PREMIUM_USER (RoleId = 2):
+//////////////////////////////////////////////////////////////////
+
+2. PREMIUM_USER about the role PREMIUM_USER (RoleId = 2): -> Creator 150 new artist in database
 login/email: userpremium@gmail.com
 password: password1
 
-Authentication =
-Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjUiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoidXNlclByZW1pdW0gdXNlclByZW1pdW0iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJQcmVtaXVtVXNlciIsIkRhdGVPZkJpcnRoIjoiMjAwMC0xMi0yOCIsIk5hdGlvbmFsaXR5IjoiUG9saXNoIiwiZXhwIjoxNzA1MDYwNzAzLCJpc3MiOiJodHRwOi8vbXVzaWNzdG9yZWFwaS5jb20iLCJhdWQiOiJodHRwOi8vbXVzaWNzdG9yZWFwaS5jb20ifQ.0yZRjfmOAd9HuDMbRs79aIYGsSnMpWD65Xsnp58PMj8
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+
+//////////////////////////////////////////////////////////////////
 
 3. PREMIUM_USER_2 about the role PREMIUM_USER (RoleId = 2):
 login/ email : premiumuser2@gmail.com
 password : password1
 
-Authentication =
-Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjciLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoicHJlbWl1bXVzZXIyIHByZW1pdW11c2VyMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IlByZW1pdW1Vc2VyIiwiRGF0ZU9mQmlydGgiOiIyMDAwLTEyLTI4IiwiTmF0aW9uYWxpdHkiOiJQb2xpc2giLCJleHAiOjE3MDUwNjA5NjQsImlzcyI6Imh0dHA6Ly9tdXNpY3N0b3JlYXBpLmNvbSIsImF1ZCI6Imh0dHA6Ly9tdXNpY3N0b3JlYXBpLmNvbSJ9.cGJfi9XsvMKRZjHn09iZCtGRQLdqcW-0ByLK2VD95K4
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+
+Authentication = Bearer {Token JWT} 
+
+////////////////////////////////////////////////////////////////////
 
 4. ADMIN about the role ADMIN (RoleId = 3):
 login / email: admin2@gmail.com
 password: password1
 
-Authentication =
-Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjYiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiYWRtaW4yIGFkbWluMiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwiRGF0ZU9mQmlydGgiOiIyMDAwLTEyLTI4IiwiTmF0aW9uYWxpdHkiOiJQb2xpc2giLCJleHAiOjE3MDUwNjA3ODksImlzcyI6Imh0dHA6Ly9tdXNpY3N0b3JlYXBpLmNvbSIsImF1ZCI6Imh0dHA6Ly9tdXNpY3N0b3JlYXBpLmNvbSJ9._FXhHTXPoYwq9pUgcMHnCyJI5aXGD2pnKeBq8fNDqSc
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+
+
+If you test applications locally, e.g. link: https://localhost:5110/api/artist, four users and 150 artists created by the user with the email address: userpremium@gmail.com will also be available, you just need to follow the instructions in visual studio 2022 community or VS code:
+1. update-database
+2. Then run the application, when you first start the application: 150 artists will be created, created by a user with email: userpremium@gmail.com and password: password1. For testing purposes, 4 users will be created with the roles 1->USER, 2->PREMIUMUSER, 2->PREMIUMUSER, 3->ADMIN. Their login and password are provided above. You need to log in to the application, generate a new JWT Token and you can test all actions in the Web API.

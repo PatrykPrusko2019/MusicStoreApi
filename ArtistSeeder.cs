@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using MusicStoreApi.Entities;
 
 namespace MusicStoreApi
@@ -6,12 +7,14 @@ namespace MusicStoreApi
     public class ArtistSeeder
     {
         private readonly ArtistDbContext _dbContext;
+        private readonly IPasswordHasher<User> _passwordHasher;
         private List<string> NamesArtists = new List<string>() { "Iron Maiden", "Offspring", "Korn", "Metallica", "ACDC", "Dzem", "Sepultura", "Green Day", "Vergin", "Venflon"};
 
 
-        public ArtistSeeder(ArtistDbContext artistDbContext)
+        public ArtistSeeder(ArtistDbContext artistDbContext, IPasswordHasher<User> passwordHasher)
         {
             _dbContext = artistDbContext;
+            _passwordHasher = passwordHasher;
         }
 
         public void Seed()
@@ -32,6 +35,13 @@ namespace MusicStoreApi
                 _dbContext.SaveChanges();
             }
 
+            if (!_dbContext.Users.Any())
+            {
+                var users = GetUsers();
+                _dbContext.Users.AddRange(users);
+                _dbContext.SaveChanges();
+            }
+
             if (!_dbContext.Artists.Any())
             {
                 var artists = GetArtists();
@@ -39,6 +49,69 @@ namespace MusicStoreApi
                 _dbContext.SaveChanges();
             }
 
+        }
+
+
+        private IEnumerable<User> GetUsers()
+        {
+            var users = new List<User>();
+
+            var user = 
+               new User
+               { FirstName = "User",
+                 LastName = "User",
+                 Email = "user2@gmail.com",
+                 DateOfBirth = new DateTime(1990, 1, 1),
+                 Nationality = "Polish",
+                 RoleId = 1
+            };
+            user.PasswordHash = _passwordHasher.HashPassword(user, "password1");
+
+            users.Add(user);
+
+            var userpremium1 =
+               new User
+               {
+                   FirstName = "userpremium",
+                   LastName = "userpremium",
+                   Email = "userpremium@gmail.com",
+                   DateOfBirth = new DateTime(1990, 1, 1),
+                   Nationality = "Polish",
+                   RoleId = 2
+               };
+            userpremium1.PasswordHash = _passwordHasher.HashPassword(userpremium1, "password1");
+
+            users.Add(userpremium1);
+
+            var userpremium2 =
+               new User
+               {
+                   FirstName = "userpremium2",
+                   LastName = "userpremium2",
+                   Email = "premiumuser2@gmail.com",
+                   DateOfBirth = new DateTime(1990, 1, 1),
+                   Nationality = "Polish",
+                   RoleId = 2
+               };
+            userpremium2.PasswordHash = _passwordHasher.HashPassword(userpremium2, "password1");
+
+            users.Add(userpremium2);
+
+            var admin =
+               new User
+               {
+                   FirstName = "admin",
+                   LastName = "admin",
+                   Email = "admin2@gmail.com",
+                   DateOfBirth = new DateTime(1990, 1, 1),
+                   Nationality = "Polish",
+                   RoleId = 3
+               };
+            admin.PasswordHash = _passwordHasher.HashPassword(admin, "password1");
+
+            users.Add(admin);
+
+            return users;
         }
 
         private IEnumerable<Role> GetRoles()
@@ -63,7 +136,7 @@ namespace MusicStoreApi
 
         private IEnumerable<Artist> GetArtists()
         {
-            var user = _dbContext.Users.FirstOrDefault(u => u.Email == "premiumuser@gmail.com");
+            var user = _dbContext.Users.FirstOrDefault(u => u.Email == "userpremium@gmail.com"); 
 
             var artists = new List<Artist>();
             int count = 1;
