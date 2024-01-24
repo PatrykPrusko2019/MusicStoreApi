@@ -126,7 +126,7 @@ There are also 4 additional Users created:
 login/email: user2@gmail.com
 password: password1
 
-in Parameter in Postman -> Authorization = Bearer {Token JWT}
+use in Header in Postman -> Authorization = Bearer {Token JWT}
 
 //////////////////////////////////////////////////////////////////
 
@@ -134,7 +134,7 @@ in Parameter in Postman -> Authorization = Bearer {Token JWT}
 login/email: userpremium@gmail.com
 password: password1
 
-in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+use in Header in Postman -> Authentication = Bearer {Token JWT} 
 
 //////////////////////////////////////////////////////////////////
 
@@ -142,7 +142,7 @@ in Parameter in Postman -> Authentication = Bearer {Token JWT}
 login/ email : premiumuser2@gmail.com
 password : password1
 
-in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+use in Header in Postman -> Authentication = Bearer {Token JWT} 
 
 Authentication = Bearer {Token JWT} 
 
@@ -152,7 +152,7 @@ Authentication = Bearer {Token JWT}
 login / email: admin2@gmail.com
 password: password1
 
-in Parameter in Postman -> Authentication = Bearer {Token JWT} 
+use in Header in Postman -> Authentication = Bearer {Token JWT} 
 
 
 If you test applications locally, e.g. link: https://localhost:5110/api/artist, four users and 150 artists created by the user with the email address: userpremium@gmail.com will also be available, you just need to follow the instructions in visual studio 2022 community or VS code:
