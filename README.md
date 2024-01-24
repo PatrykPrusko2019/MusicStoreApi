@@ -34,7 +34,7 @@ the actions in the api as a logged in user, you need to send in the header Key -
 Artist 
 GET -> api/artist 
  You can search for all artists with its albums and songs, you need to specify two values in the parameters: PageSize -> 5, 10, 15 and PageNumber -> 1, 2, 3 ... etc. In addition, 3 more values can be entered: 
- SearchWord -> searches for a given word after given Name or Description records, SortDirection -> 0(asc), 1(desc), sorts ascending or descending, SortBy -> sorts after given Name, Description, KindOfMusic records. 
+ SearchWord -> searches for a given word after given Name or Description records, SortDirection -> 1(asc), 2(desc), sorts ascending or descending, SortBy -> sorts after given Name, Description, KindOfMusic records. 
  In addition, result pagination(pagination) information with values is shown: TotalPages -> all possible pages, TotalItemsCount -> all records, ItemFrom -> shows the beginning of the page where the item starts,
  ItemTo -> shows the end of the page where the item ends. 
 
@@ -126,7 +126,7 @@ There are also 4 additional Users created:
 login/email: user2@gmail.com
 password: password1
 
-use in Header in Postman -> Authorization = Bearer {Token JWT}
+in Parameter in Postman -> Authorization = Bearer {Token JWT}
 
 //////////////////////////////////////////////////////////////////
 
@@ -134,7 +134,7 @@ use in Header in Postman -> Authorization = Bearer {Token JWT}
 login/email: userpremium@gmail.com
 password: password1
 
-use in Header in Postman -> Authentication = Bearer {Token JWT} 
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
 
 //////////////////////////////////////////////////////////////////
 
@@ -142,7 +142,7 @@ use in Header in Postman -> Authentication = Bearer {Token JWT}
 login/ email : premiumuser2@gmail.com
 password : password1
 
-use in Header in Postman -> Authentication = Bearer {Token JWT} 
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
 
 Authentication = Bearer {Token JWT} 
 
@@ -152,9 +152,19 @@ Authentication = Bearer {Token JWT}
 login / email: admin2@gmail.com
 password: password1
 
-use in Header in Postman -> Authentication = Bearer {Token JWT} 
+in Parameter in Postman -> Authentication = Bearer {Token JWT} 
 
 
 If you test applications locally, e.g. link: https://localhost:5110/api/artist, four users and 150 artists created by the user with the email address: userpremium@gmail.com will also be available, you just need to follow the instructions in visual studio 2022 community or VS code:
 1. update-database
 2. Then run the application, when you first start the application: 150 artists will be created, created by a user with email: userpremium@gmail.com and password: password1. For testing purposes, 4 users will be created with the roles 1->USER, 2->PREMIUMUSER, 2->PREMIUMUSER, 3->ADMIN. Their login and password are provided above. You need to log in to the application, generate a new JWT Token and you can test all actions in the Web API.
+
+Additionally created / changed things for frontend application: FrontEndStoreMusicAPI , on github at link : https://github.com/PatrykPrusko2019/FrontendStoreMusicApiUsingWPF :  
+1. Adding a new endpoint -> GET api/login/user/{email} -> to access the user details and the generated JWT Token, when logged into the main Music Store window.  
+2. Adding a new endpoint -> GET api/login/user/{userId}/artist -> to have access, after logging into the main Music Store window, to all the artists created by a given user and the details to display.  
+3. Adding a new endpoint -> GET api/song -> retrieves all songs from the database.  
+4. Adding a new endpoint -> GET api/album -> retrieves all albums from the database.  
+5. Changing data sorting, if you don't select ASC (1)-> ascending or DESC (2) descending and SearchWord, it doesn't sort.  
+6. Adding a new endpoint -> GET api/artist/{artistId}/album/{albumId}/song/details/{songId} -> to access the details of a given song with additional fields: AlbumTitle, ArtistId, ArtistName.  
+7. Add a new endpoint -> GET api/artist/{artistId}/album/details/{albumId} -> to access the details of a given album with additional fields: ArtistName, ArtistId.  
+8. Add a new endpoint -> GET api/artist/details/{Id} -> to access the details of a given artist with additional fields: ContactEmail, ContactNumber. 
