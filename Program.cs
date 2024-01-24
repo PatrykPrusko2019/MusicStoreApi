@@ -56,14 +56,18 @@ public class Program
         builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
         builder.Services.AddScoped<IArtistService, ArtistService>();
         builder.Services.AddScoped<IAlbumService, AlbumService>();
+        builder.Services.AddScoped<IAllAlbumsService, AllAlbumsService>();
         builder.Services.AddScoped<ISongService, SongService>();
+        builder.Services.AddScoped<IAllSongsService, AllSongsService>();
         builder.Services.AddScoped<IAccountService, AccountService>();
+        builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
 
         builder.Services.AddScoped<IValidator<RegisterUserDto>, RegisterUserDtoValidator>();
         builder.Services.AddScoped<IValidator<LoginDto>, LoginUserDtoValidator>();
         builder.Services.AddScoped<IValidator<ArtistQuery>, ArtistQueryValidator>();
         builder.Services.AddScoped<IValidator<AlbumQuery>, AlbumQueryValidator>();
+        builder.Services.AddScoped<IValidator<SongQuery>, SongQueryValidator>();
 
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
         builder.Services.AddScoped<RequestTimeMiddleware>();

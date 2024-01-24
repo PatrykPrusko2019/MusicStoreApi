@@ -11,5 +11,6 @@ namespace MusicStoreApi.Models
         public string Country { get; set; }
         public string City { get; set; }
         public List<AlbumDto> Albums { get; set; }
+        public int CreatedById { get; set; }
     }
 }

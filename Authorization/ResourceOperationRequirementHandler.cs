@@ -23,8 +23,8 @@ namespace MusicStoreApi.Authorization
                 context.Succeed(requirement);
             }
 
-            if (requirement.ResourceOperation == ResourceOperation.Create && 
-                (userRule == "PremiumUser" || userRule == "Admin"))
+            if (requirement.ResourceOperation == ResourceOperation.Create &&
+                ((userRule == "Admin" || (userRule == "PremiumUser" && artist.CreatedById == int.Parse(userId)))))
             {
                 context.Succeed(requirement);
             }

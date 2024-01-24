@@ -7,6 +7,7 @@ using MusicStoreApi.Authorization;
 using MusicStoreApi.Entities;
 using MusicStoreApi.Exceptions;
 using MusicStoreApi.Models;
+using System.Linq.Expressions;
 
 namespace MusicStoreApi.Services
 {
@@ -33,7 +34,7 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
 
-            CheckIsUnigueName(artistId,  albumId, createSongDto.Name);
+            CheckIsUniqueName(artistId, albumId, createSongDto.Name, -1);
 
             var songEntity = mapper.Map<Song>(createSongDto);
             songEntity.AlbumId = albumId;
@@ -52,7 +53,7 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
 
-            CheckIsUnigueName(artistId, albumId, createSongDto.Name);
+            CheckIsUniqueName(artistId, albumId, createSongDto.Name, songId);
 
             song.Name = createSongDto.Name;
 
@@ -70,7 +71,7 @@ namespace MusicStoreApi.Services
             foreach (var songs in deleteSongs) artistDbContext.Songs.Remove(songs);
             artistDbContext.SaveChanges();
 
-            logger.LogInformation($"Removed song: api/artist/{artistId}/album/{albumId}");
+            logger.LogInformation($"Removed song: api/artist/{artistId}/album/{albumId}/song");
         }
 
         public void DeleteById(int artistId, int albumId, int songId)
@@ -87,11 +88,29 @@ namespace MusicStoreApi.Services
             logger.LogInformation($"Removed song: {name} , api/artist/{artistId}/album/{albumId}/song/{songId}");
         }
 
-        public List<SongDto> GetAll(int artistId, int albumId) 
+        public List<SongDto> GetAll(int artistId, int albumId, SongQuery searchQuery)
         {
-            var songs = CheckIfIdIsCorrectAndGetSongs(artistId, albumId, true);
+            CheckIfIdIsCorrectAndGetSongs(artistId, albumId, true);
 
-            var songsDtos = mapper.Map<List<SongDto>>(songs);
+            var baseQuery = artistDbContext.Songs
+                .Where(s => s.AlbumId == albumId)
+                .Where(s => searchQuery.SearchWord == null || s.Name.ToLower().Contains(searchQuery.SearchWord.ToLower()));
+
+            if (!string.IsNullOrEmpty(searchQuery.SortBy))
+            {
+                var columnsSelectors = new Dictionary<string, Expression<Func<Song, object>>>
+                {
+                    { nameof(Song.Name), a => a.Name }
+                };
+
+                var selectedColumn = columnsSelectors[searchQuery.SortBy];
+
+                baseQuery = searchQuery.SortDirection == SortDirection.ASC
+                    ? baseQuery.OrderBy(selectedColumn)
+                    : baseQuery.OrderByDescending(selectedColumn);
+            }
+
+            var songsDtos = mapper.Map<List<SongDto>>(baseQuery);
             return songsDtos;
         }
 
@@ -122,6 +141,26 @@ namespace MusicStoreApi.Services
             return song;
         }
 
+        public DetailsSongDto GetDetailsById(int artistId, int albumId, int songId)
+        {
+            var song = GetById(artistId, albumId, songId);
+
+            string nameArtist = artistDbContext.Artists.FirstOrDefault(a => a.Id == artistId).Name;
+
+            string nameAlbum = artistDbContext.Albums.FirstOrDefault(a => a.Id == albumId).Title;
+
+            DetailsSongDto detailsSongDto = new DetailsSongDto()
+            {
+                Id = song.Id,
+                Name = song.Name,
+                AlbumId = albumId,
+                AlbumTitle = nameAlbum,
+                ArtistId = artistId,
+                ArtistName = nameArtist
+            };
+
+            return detailsSongDto;
+        }
         private List<Song> CheckIfIdIsCorrectAndGetSongs(int artistId, int albumId, bool isGetSongsOrIsCheckId)
         {
             GetSongById(artistId, albumId, 0, true); // checks if ids numbers are correct
@@ -155,14 +194,30 @@ namespace MusicStoreApi.Services
             }
         }
 
-        private void CheckIsUnigueName(int artistId, int albumId, string name)
+        private void CheckIsUniqueName(int artistId, int albumId, string name, int songId)
         {
             var album = artistDbContext.Albums
                 .Include(s => s.Songs)
                 .FirstOrDefault(a => a.ArtistId == artistId && a.Id == albumId);
 
             if (album.Songs.IsNullOrEmpty()) return;
-            var isDuplicate = album.Songs.Any(a => a.Name == name);
+
+            bool isDuplicate = false;
+
+            if (songId != -1) //update value
+            {
+                var result = album.Songs.Any(a => a.Name == name);
+                if (result)
+                {
+                    var songIdDuplicate = album.Songs.FirstOrDefault(a => a.Name == name).Id;
+                    if (songIdDuplicate != songId) isDuplicate = true;
+                }
+            }
+            else //create value
+            {
+                isDuplicate = album.Songs.Any(a => a.Name == name);
+            }
+
             if (isDuplicate) throw new DuplicateValueException("Name : value invalid, because is on the songs's list");
         }
 

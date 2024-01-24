@@ -10,5 +10,6 @@ namespace MusicStoreApi.Services
         void Update(int id, UpdateArtistDto updatedArtistDto);
         PageResult<ArtistDto> GetAll(ArtistQuery searchQuery);
         ArtistDto GetById(int id);
+        DetailsArtistDto GetDetailsById(int id);
     }
 }

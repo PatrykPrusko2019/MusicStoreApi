@@ -66,5 +66,13 @@ namespace MusicStoreApi.Controllers
             return Ok(artistDto);
         }
 
+        [HttpGet("details/{id}")]
+        public ActionResult<DetailsArtistDto> GetDetails([FromRoute] int id)
+
+        {
+            var detailsArtistDto = artistService.GetDetailsById(id);
+
+            return Ok(detailsArtistDto);
+        }
     }
 }

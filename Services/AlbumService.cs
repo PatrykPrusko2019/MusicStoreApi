@@ -35,7 +35,7 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Create);
 
-            CheckIsUnigueTitle(artistId, createAlbumDto.Title);
+            CheckIsUniqueTitle(artistId, createAlbumDto.Title, -1);
 
             var albumEntity = mapper.Map<Album>(createAlbumDto);
 
@@ -53,7 +53,7 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Update);
 
-            CheckIsUnigueTitle(artistId, updateAlbumDto.Title);
+            CheckIsUniqueTitle(artistId, updateAlbumDto.Title, albumId);
 
             album.Title = updateAlbumDto.Title;
             album.Length = updateAlbumDto.Length;
@@ -69,8 +69,8 @@ namespace MusicStoreApi.Services
 
             GetAuthorizationResult(dbContext.Artists.FirstOrDefault(a => a.Id == artistId), ResourceOperation.Delete);
 
-            foreach (var album in removeAlbums) dbContext.Albums.Remove(album);
-            
+            dbContext.Albums.RemoveRange(removeAlbums);
+
             dbContext.SaveChanges();
             logger.LogInformation($"Deleted all albums: api/artist/{artistId}");
         }
@@ -90,7 +90,7 @@ namespace MusicStoreApi.Services
 
         public List<AlbumDto> GetAll(int artistId, AlbumQuery searchQuery)
         {
-            var albums = CheckIfIdIsCorrectAndGetAlbums(artistId, true);
+            CheckIfIdIsCorrectAndGetAlbums(artistId, true);
 
             var baseQuery = dbContext.Albums
                 .Include(a => a.Songs)
@@ -140,6 +140,27 @@ namespace MusicStoreApi.Services
             return album;
         }
 
+        public DetailsAlbumDto GetDetailsById(int artistId, int albumId)
+        {
+            var album = GetById(artistId, albumId);
+
+            string nameArtist = dbContext.Artists.FirstOrDefault(a => a.Id == artistId).Name;
+
+            DetailsAlbumDto detailsAlbumDto = new DetailsAlbumDto()
+            {
+                Id = album.Id,
+                Title = album.Title,
+                Length = album.Length,
+                NumberOfSongs = album.NumberOfSongs,
+                Price = album.Price,
+                Songs = album.Songs,
+                ArtistId = artistId,
+                ArtistName = nameArtist
+            };
+
+            return detailsAlbumDto;
+        }
+
         private List<Album> CheckIfIdIsCorrectAndGetAlbums(int artistId,  bool isGetAlbumsOrIsCheckId)
         {
             GetAlbumById(artistId, 0, true); // checks if ids numbers are correct
@@ -166,7 +187,7 @@ namespace MusicStoreApi.Services
             }
         }
 
-        private void CheckIsUnigueTitle(int artistId, string title)
+        private void CheckIsUniqueTitle(int artistId, string title, int albumId)
         {
             var artist = dbContext.Artists
                 .Include(a => a.Albums)
@@ -174,7 +195,21 @@ namespace MusicStoreApi.Services
 
             if (artist.Albums.IsNullOrEmpty()) return;
 
-            var isDuplicate = artist.Albums.Any(a => a.Title == title);
+            bool isDuplicate = false;
+
+            if (albumId != -1) //update value
+            {
+                var result = artist.Albums.Any(a => a.Title == title);
+                if (result)
+                {
+                    var albumIdDuplicate = artist.Albums.FirstOrDefault(a => a.Title == title).Id;
+                    if (albumIdDuplicate != albumId) isDuplicate = true;
+                }
+            }
+            else
+            {
+                isDuplicate = artist.Albums.Any(a => a.Title == title);
+            }
             if (isDuplicate) throw new DuplicateValueException("Title : value invalid, because is on the album's list");
         }
 
