@@ -120,7 +120,7 @@ A CORS policy has been added so that in future queries can be sent to a particul
 
 Deployed application to Azure cloud : https://musicstore-api-app9.azurewebsites.net/swagger
 
-On the link https://musicstore-api-app9.azurewebsites.net/api/artist, you can test the operation of the application (please use Postman). About 148 artists have been added, created by the user with the email address: userpremium@gmail.com.
+On the link https://musicstore-api-app9.azurewebsites.net/swagger, you can test the operation of the application (please use Postman). About 148 artists have been added, created by the user with the email address: userpremium@gmail.com.
 There are also 4 additional Users created:
 1. USER about the role USER (RoleId = 1):
 login/email: user2@gmail.com
@@ -155,7 +155,7 @@ password: password1
 in Parameter in Postman -> Authentication = Bearer {Token JWT} 
 
 
-If you test applications locally, e.g. link: https://localhost:5110/api/artist, four users and 150 artists created by the user with the email address: userpremium@gmail.com will also be available, you just need to follow the instructions in visual studio 2022 community or VS code:
+If you test applications locally, e.g. link: https://musicstore-api-app9.azurewebsites.net/swagger, four users and 150 artists created by the user with the email address: userpremium@gmail.com will also be available, you just need to follow the instructions in visual studio 2022 community or VS code:
 1. update-database
 2. Then run the application, when you first start the application: 150 artists will be created, created by a user with email: userpremium@gmail.com and password: password1. For testing purposes, 4 users will be created with the roles 1->USER, 2->PREMIUMUSER, 2->PREMIUMUSER, 3->ADMIN. Their login and password are provided above. You need to log in to the application, generate a new JWT Token and you can test all actions in the Web API.
 
@@ -168,3 +168,4 @@ Additionally created / changed things for frontend application: FrontEndStoreMus
 6. Adding a new endpoint -> GET api/artist/{artistId}/album/{albumId}/song/details/{songId} -> to access the details of a given song with additional fields: AlbumTitle, ArtistId, ArtistName.  
 7. Add a new endpoint -> GET api/artist/{artistId}/album/details/{albumId} -> to access the details of a given album with additional fields: ArtistName, ArtistId.  
 8. Add a new endpoint -> GET api/artist/details/{Id} -> to access the details of a given artist with additional fields: ContactEmail, ContactNumber. 
+The ability for the Frontend application to connect to the Backend application from a link: https://musicstore-api-app9.azurewebsites.net , then you only need to change the variable in the Utilites/HelperHttpClient.cs directory , in the HelperHttpClient.cs class to the given link above. The exact description of the setting in the DescriptionOfApp directory.
