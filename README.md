@@ -24,7 +24,7 @@ POST -> api/account/login
 
 After that, you can log in to the music portal, using the sending of email information as login and password. Security: 
 - if you enter an empty or invalid email, a corresponding error message 
-- If you enter a wrong password or email, the error message -> "invalid username or password". 
+- If you enter a wrong password or email, the error message -> "invalid email(login) or password". 
 - If you enter a password with less than 6 characters, an error message will appear. 
 
 When logging into the music shop, the login (email) is checked to see if it is the same in the database, the password hash of the user (PasswordHash) is checked against the password hash (PasswordHash) 

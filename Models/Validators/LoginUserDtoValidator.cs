@@ -18,7 +18,7 @@ namespace MusicStoreApi.Models.Validators
                 .Custom((searchEmail, context) =>
                  {
                      var isValidEmail = artistDbContext.Users.Any(u => u.Email == searchEmail);
-                     if (!isValidEmail) context.AddFailure("Invalid username or password"); // There is no precise information that this is an incorrect email address, for the security of data of customers using a given application.
+                     if (!isValidEmail) context.AddFailure("Invalid email(login) or password"); // There is no precise information that this is an incorrect email address, for the security of data of customers using a given application.
                  });
 
                 
